@@ -53,11 +53,29 @@ static char *test_kv_delete() {
   return 0;
 }
 
+static char *test_kv_increment() {
+  KeyValueStore *kv = new_kv_store();
+  kv_store_add(kv, "counter", "123");
+  kv_store_increment(kv, "counter");
+  mu_assert("kv_store_increment should increment integers",
+            strcmp(kv_store_get(kv, "counter"), "124") == 0);
+
+  kv_store_increment(kv, "a");
+  mu_assert("kv_store_increment should create new keys if key does not exist",
+            strcmp(kv_store_get(kv, "a"), "1") == 0);
+
+  kv_store_add(kv, "string", "hello world");
+  mu_assert("kv_store increment should return error if value is not an integer",
+            kv_store_increment(kv, "string") == -1);
+  return 0;
+}
+
 static char *all_tests() {
   mu_run_test(test_kv_add);
   mu_run_test(test_kv_get);
   mu_run_test(test_kv_exists);
   mu_run_test(test_kv_delete);
+  mu_run_test(test_kv_increment);
   return 0;
 }
 

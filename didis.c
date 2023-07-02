@@ -91,3 +91,16 @@ int kv_store_delete(KeyValueStore *kv, kv_key key) {
 
   return 1;
 }
+
+int kv_store_increment(KeyValueStore *kv, kv_key key) {
+  int index = kv_store_find_key_index(kv, key);
+
+  if (index < 0) {
+    kv_store_add(kv, key, "1");
+    return 1;
+  }
+
+  long incremented = strtol(kv->values[index], NULL, 10) + 1;
+  sprintf(kv->values[index], "%ld", incremented);
+  return incremented;
+}
