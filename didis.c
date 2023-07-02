@@ -118,7 +118,13 @@ ReturnValue kv_store_increment(KeyValueStore *kv, kv_key key) {
     return r;
   }
 
-  long incremented = strtol(kv->values[index], NULL, 10) + 1;
+  char *badchar;
+  long incremented = strtol(kv->values[index], &badchar, 10) + 1;
+  if (*badchar != '\0') {
+    r.type = ERR_RETURN;
+    r.error_message = "Cannot increment non-integer";
+    return r;
+  }
   sprintf(kv->values[index], "%ld", incremented);
   r.type = INT_RETURN;
   r.integer = incremented;
