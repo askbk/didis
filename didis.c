@@ -11,6 +11,17 @@ KeyValueStore *new_kv_store(void) {
   return kv;
 }
 
+void delete_kv_store(KeyValueStore *kv) {
+  for (int i = 0; i < kv->size; ++i) {
+    free(kv->keys[i]);
+    free(kv->values[i]);
+  }
+
+  free(kv->keys);
+  free(kv->values);
+  free(kv);
+}
+
 int kv_store_add(KeyValueStore *kv, char *key, char *value) {
   for (int i = 0; i < kv->size; ++i) {
     if (strcmp(kv->keys[i], key) == 0) {

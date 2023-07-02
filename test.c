@@ -5,9 +5,6 @@
 
 int tests_run = 0;
 
-int foo = 7;
-int bar = 4;
-
 static char *test_kv_add() {
   KeyValueStore *kv = new_kv_store();
   mu_assert("error, nonempty kv store", kv->size == 0);
@@ -15,6 +12,7 @@ static char *test_kv_add() {
   kv_store_add(kv, "ab", "yoyo");
   kv_store_add(kv, "ab", "yoyo1");
   mu_assert("size != 2 after adding 2 keys", kv->size == 2);
+  delete_kv_store(kv);
   return 0;
 }
 
@@ -27,6 +25,7 @@ static char *test_kv_get() {
 
   mu_assert("kv_get should return NULL when key does not exist",
             kv_store_get(kv, "blah") == NULL);
+  delete_kv_store(kv);
   return 0;
 }
 
