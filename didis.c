@@ -22,7 +22,7 @@ void delete_kv_store(KeyValueStore *kv) {
   free(kv);
 }
 
-int kv_store_add(KeyValueStore *kv, char *key, char *value) {
+int kv_store_add(KeyValueStore *kv, kv_key key, char *value) {
   for (int i = 0; i < kv->size; ++i) {
     if (strcmp(kv->keys[i], key) == 0) {
       kv->values[i] = realloc(kv->values[i], strlen(value) + 1);
@@ -46,7 +46,7 @@ int kv_store_add(KeyValueStore *kv, char *key, char *value) {
   return 0;
 }
 
-char *kv_store_get(KeyValueStore *kv, char *key) {
+char *kv_store_get(KeyValueStore *kv, kv_key key) {
   for (int i = 0; i < kv->size; ++i) {
     if (strcmp(kv->keys[i], key) == 0) {
       return kv->values[i];
@@ -56,7 +56,7 @@ char *kv_store_get(KeyValueStore *kv, char *key) {
   return NULL;
 }
 
-int kv_store_key_exists(KeyValueStore *kv, char *key) {
+int kv_store_key_exists(KeyValueStore *kv, kv_key key) {
   for (int i = 0; i < kv->size; ++i) {
     if (strcmp(key, kv->keys[i]) == 0) {
       return 1;
