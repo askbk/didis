@@ -29,9 +29,21 @@ static char *test_kv_get() {
   return 0;
 }
 
+static char *test_kv_exists() {
+  KeyValueStore *kv = new_kv_store();
+  kv_store_add(kv, "hello", "world");
+  mu_assert("kv_store_key_exists should return 1 when key exists",
+            kv_store_key_exists(kv, "hello"));
+  mu_assert("kv_store_key_exists should return 0 when key does not exist",
+            !kv_store_key_exists(kv, "fdsafdsa"));
+  delete_kv_store(kv);
+  return 0;
+}
+
 static char *all_tests() {
   mu_run_test(test_kv_add);
   mu_run_test(test_kv_get);
+  mu_run_test(test_kv_exists);
   return 0;
 }
 

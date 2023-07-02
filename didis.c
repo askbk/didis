@@ -55,3 +55,13 @@ char *kv_store_get(KeyValueStore *kv, char *key) {
 
   return NULL;
 }
+
+int kv_store_key_exists(KeyValueStore *kv, char *key) {
+  for (int i = 0; i < kv->size; ++i) {
+    if (strcmp(key, kv->keys[i]) == 0) {
+      return 1;
+    }
+  }
+
+  return 0;
+}
