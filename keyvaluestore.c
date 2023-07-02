@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "didis.h"
+#include "common.h"
+#include "keyvaluestore.h"
 
 KeyValueStore *new_kv_store(void) {
   KeyValueStore *kv = malloc(sizeof(KeyValueStore));
@@ -26,31 +27,6 @@ void print_kv_contents(KeyValueStore *kv) {
   for (int i = 0; i < kv->size; ++i) {
     printf("%s: %s\n", kv->keys[i], kv->values[i]);
   }
-}
-
-static ReturnValue make_string(char *string) {
-  ReturnValue r = {.type = STR_RETURN, .string = string};
-  return r;
-}
-
-static ReturnValue make_integer(long integer) {
-  ReturnValue r = {.type = INT_RETURN, .integer = integer};
-  return r;
-}
-
-static ReturnValue make_nil() {
-  ReturnValue r = {.type = NIL_RETURN};
-  return r;
-}
-
-static ReturnValue make_ok() {
-  ReturnValue r = {.type = OK_RETURN};
-  return r;
-}
-
-static ReturnValue make_error(char *error) {
-  ReturnValue r = {.type = ERR_RETURN, .error_message = error};
-  return r;
 }
 
 static int kv_key_compare(kv_key k1, kv_key k2) { return strcmp(k1, k2) == 0; }

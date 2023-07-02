@@ -1,2 +1,2 @@
 #!/usr/bin/sh
-gcc test.c didis.c -o test.out -Wall -Werror && ./test.out
+gcc test.c common.c keyvaluestore.c -o test.out -Wall -Werror && ./test.out

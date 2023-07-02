@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "minunit.h"
-#include "didis.h"
+#include "keyvaluestore.h"
 
 int tests_run = 0;
 
