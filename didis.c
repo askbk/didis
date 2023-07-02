@@ -28,6 +28,31 @@ void print_kv_contents(KeyValueStore *kv) {
   }
 }
 
+static ReturnValue make_string(char *string) {
+  ReturnValue r = {.type = STR_RETURN, .string = string};
+  return r;
+}
+
+static ReturnValue make_integer(long integer) {
+  ReturnValue r = {.type = INT_RETURN, .integer = integer};
+  return r;
+}
+
+static ReturnValue make_nil() {
+  ReturnValue r = {.type = NIL_RETURN};
+  return r;
+}
+
+static ReturnValue make_ok() {
+  ReturnValue r = {.type = OK_RETURN};
+  return r;
+}
+
+static ReturnValue make_error(char *error) {
+  ReturnValue r = {.type = ERR_RETURN, .error_message = error};
+  return r;
+}
+
 static int kv_key_compare(kv_key k1, kv_key k2) { return strcmp(k1, k2) == 0; }
 
 static int kv_store_find_key_index(KeyValueStore *kv, kv_key key) {
@@ -45,8 +70,7 @@ ReturnValue kv_store_add(KeyValueStore *kv, kv_key key, kv_value value) {
     kv->values[existing_key_index] =
         realloc(kv->values[existing_key_index], strlen(value) + 1);
     strcpy(kv->values[existing_key_index], value);
-    ReturnValue ok = {.type = OK_RETURN};
-    return ok;
+    return make_ok();
   }
 
   ++(kv->size);
@@ -61,35 +85,22 @@ ReturnValue kv_store_add(KeyValueStore *kv, kv_key key, kv_value value) {
   strcpy(kv->keys[index], key);
   strcpy(kv->values[index], value);
 
-  ReturnValue ok = {.type = OK_RETURN};
-  return ok;
+  return make_ok();
 }
 
 ReturnValue kv_store_get(KeyValueStore *kv, kv_key key) {
   int key_index = kv_store_find_key_index(kv, key);
-  ReturnValue r;
-  if (key_index == -1) {
-    r.type = NIL_RETURN;
-    return r;
-  };
-  r.type = STR_RETURN;
-  r.string = kv->values[key_index];
-  return r;
+  if (key_index == -1) return make_nil();
+  return make_string(kv->values[key_index]);
 }
 
 ReturnValue kv_store_key_exists(KeyValueStore *kv, kv_key key) {
-  ReturnValue r = {.type = INT_RETURN,
-                   .integer = kv_store_find_key_index(kv, key) >= 0};
-  return r;
+  return make_integer(kv_store_find_key_index(kv, key) >= 0);
 }
 
 ReturnValue kv_store_delete(KeyValueStore *kv, kv_key key) {
   int key_index = kv_store_find_key_index(kv, key);
-  ReturnValue r = {.type = INT_RETURN};
-  if (key_index < 0) {
-    r.integer = 0;
-    return r;
-  };
+  if (key_index < 0) return make_integer(0);
 
   if (key_index < kv->size - 1) {
     memmove(&kv->keys[key_index], &kv->keys[key_index + 1],
@@ -103,30 +114,20 @@ ReturnValue kv_store_delete(KeyValueStore *kv, kv_key key) {
   kv->keys = realloc(kv->keys, kv->size * sizeof(kv_key));
   kv->values = realloc(kv->values, kv->size * sizeof(kv_value));
 
-  r.integer = 1;
-  return r;
+  return make_integer(1);
 }
 
 ReturnValue kv_store_increment(KeyValueStore *kv, kv_key key) {
-  ReturnValue r;
   int index = kv_store_find_key_index(kv, key);
 
   if (index < 0) {
     kv_store_add(kv, key, "1");
-    r.type = INT_RETURN;
-    r.integer = 1;
-    return r;
+    return make_integer(1);
   }
 
   char *badchar;
   long incremented = strtol(kv->values[index], &badchar, 10) + 1;
-  if (*badchar != '\0') {
-    r.type = ERR_RETURN;
-    r.error_message = "Cannot increment non-integer";
-    return r;
-  }
+  if (*badchar != '\0') return make_error("Cannot increment non-integer");
   sprintf(kv->values[index], "%ld", incremented);
-  r.type = INT_RETURN;
-  r.integer = incremented;
-  return r;
+  return make_integer(incremented);
 }
