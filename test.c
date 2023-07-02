@@ -40,10 +40,24 @@ static char *test_kv_exists() {
   return 0;
 }
 
+static char *test_kv_delete() {
+  KeyValueStore *kv = new_kv_store();
+  kv_store_add(kv, "a", "hello world");
+  kv_store_add(kv, "ab", "yoyo");
+  kv_store_delete(kv, "a");
+  mu_assert("kv_store_delete should delete element from store",
+            !kv_store_key_exists(kv, "a"));
+  mu_assert("Deleting same key twice should be fine",
+            kv_store_delete(kv, "a") == 0);
+  delete_kv_store(kv);
+  return 0;
+}
+
 static char *all_tests() {
   mu_run_test(test_kv_add);
   mu_run_test(test_kv_get);
   mu_run_test(test_kv_exists);
+  mu_run_test(test_kv_delete);
   return 0;
 }
 

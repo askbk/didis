@@ -22,6 +22,12 @@ void delete_kv_store(KeyValueStore *kv) {
   free(kv);
 }
 
+void print_kv_contents(KeyValueStore *kv) {
+  for (int i = 0; i < kv->size; ++i) {
+    printf("%s: %s\n", kv->keys[i], kv->values[i]);
+  }
+}
+
 static int kv_key_compare(kv_key k1, kv_key k2) { return strcmp(k1, k2) == 0; }
 
 static int kv_store_find_key_index(KeyValueStore *kv, kv_key key) {
@@ -32,7 +38,7 @@ static int kv_store_find_key_index(KeyValueStore *kv, kv_key key) {
   return -1;
 }
 
-int kv_store_add(KeyValueStore *kv, kv_key key, char *value) {
+int kv_store_add(KeyValueStore *kv, kv_key key, kv_value value) {
   int existing_key_index = kv_store_find_key_index(kv, key);
 
   if (existing_key_index >= 0) {
@@ -65,4 +71,23 @@ char *kv_store_get(KeyValueStore *kv, kv_key key) {
 
 int kv_store_key_exists(KeyValueStore *kv, kv_key key) {
   return kv_store_find_key_index(kv, key) >= 0;
+}
+
+int kv_store_delete(KeyValueStore *kv, kv_key key) {
+  int key_index = kv_store_find_key_index(kv, key);
+  if (key_index < 0) return 0;
+
+  if (key_index < kv->size - 1) {
+    memmove(&kv->keys[key_index], &kv->keys[key_index + 1],
+            sizeof(kv_key) * (kv->size - key_index - 1));
+    memmove(&kv->values[key_index], &kv->values[key_index + 1],
+            sizeof(kv_value) * (kv->size - key_index - 1));
+  }
+
+  --(kv->size);
+
+  kv->keys = realloc(kv->keys, kv->size * sizeof(kv_key));
+  kv->values = realloc(kv->values, kv->size * sizeof(kv_value));
+
+  return 1;
 }
