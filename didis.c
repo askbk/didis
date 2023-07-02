@@ -38,14 +38,15 @@ static int kv_store_find_key_index(KeyValueStore *kv, kv_key key) {
   return -1;
 }
 
-int kv_store_add(KeyValueStore *kv, kv_key key, kv_value value) {
+ReturnValue kv_store_add(KeyValueStore *kv, kv_key key, kv_value value) {
   int existing_key_index = kv_store_find_key_index(kv, key);
 
   if (existing_key_index >= 0) {
     kv->values[existing_key_index] =
         realloc(kv->values[existing_key_index], strlen(value) + 1);
     strcpy(kv->values[existing_key_index], value);
-    return 0;
+    ReturnValue ok = {.type = OK_RETURN};
+    return ok;
   }
 
   ++(kv->size);
@@ -60,22 +61,35 @@ int kv_store_add(KeyValueStore *kv, kv_key key, kv_value value) {
   strcpy(kv->keys[index], key);
   strcpy(kv->values[index], value);
 
-  return 0;
+  ReturnValue ok = {.type = OK_RETURN};
+  return ok;
 }
 
-char *kv_store_get(KeyValueStore *kv, kv_key key) {
+ReturnValue kv_store_get(KeyValueStore *kv, kv_key key) {
   int key_index = kv_store_find_key_index(kv, key);
-  if (key_index == -1) return NULL;
-  return kv->values[key_index];
+  ReturnValue r;
+  if (key_index == -1) {
+    r.type = NIL_RETURN;
+    return r;
+  };
+  r.type = STR_RETURN;
+  r.string = kv->values[key_index];
+  return r;
 }
 
-int kv_store_key_exists(KeyValueStore *kv, kv_key key) {
-  return kv_store_find_key_index(kv, key) >= 0;
+ReturnValue kv_store_key_exists(KeyValueStore *kv, kv_key key) {
+  ReturnValue r = {.type = INT_RETURN,
+                   .integer = kv_store_find_key_index(kv, key) >= 0};
+  return r;
 }
 
-int kv_store_delete(KeyValueStore *kv, kv_key key) {
+ReturnValue kv_store_delete(KeyValueStore *kv, kv_key key) {
   int key_index = kv_store_find_key_index(kv, key);
-  if (key_index < 0) return 0;
+  ReturnValue r = {.type = INT_RETURN};
+  if (key_index < 0) {
+    r.integer = 0;
+    return r;
+  };
 
   if (key_index < kv->size - 1) {
     memmove(&kv->keys[key_index], &kv->keys[key_index + 1],
@@ -89,18 +103,24 @@ int kv_store_delete(KeyValueStore *kv, kv_key key) {
   kv->keys = realloc(kv->keys, kv->size * sizeof(kv_key));
   kv->values = realloc(kv->values, kv->size * sizeof(kv_value));
 
-  return 1;
+  r.integer = 1;
+  return r;
 }
 
-int kv_store_increment(KeyValueStore *kv, kv_key key) {
+ReturnValue kv_store_increment(KeyValueStore *kv, kv_key key) {
+  ReturnValue r;
   int index = kv_store_find_key_index(kv, key);
 
   if (index < 0) {
     kv_store_add(kv, key, "1");
-    return 1;
+    r.type = INT_RETURN;
+    r.integer = 1;
+    return r;
   }
 
   long incremented = strtol(kv->values[index], NULL, 10) + 1;
   sprintf(kv->values[index], "%ld", incremented);
-  return incremented;
+  r.type = INT_RETURN;
+  r.integer = incremented;
+  return r;
 }

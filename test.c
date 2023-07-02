@@ -19,12 +19,12 @@ static char *test_kv_add() {
 static char *test_kv_get() {
   KeyValueStore *kv = new_kv_store();
   kv_store_add(kv, "hello", "world");
-  char *v = kv_store_get(kv, "hello");
+  char *v = kv_store_get(kv, "hello").string;
   mu_assert("kv_get should return value that was inserted",
             strcmp("world", v) == 0);
 
-  mu_assert("kv_get should return NULL when key does not exist",
-            kv_store_get(kv, "blah") == NULL);
+  mu_assert("kv_get should return NIL when key does not exist",
+            kv_store_get(kv, "blah").type == NIL_RETURN);
   delete_kv_store(kv);
   return 0;
 }
@@ -33,9 +33,9 @@ static char *test_kv_exists() {
   KeyValueStore *kv = new_kv_store();
   kv_store_add(kv, "hello", "world");
   mu_assert("kv_store_key_exists should return 1 when key exists",
-            kv_store_key_exists(kv, "hello"));
+            kv_store_key_exists(kv, "hello").integer);
   mu_assert("kv_store_key_exists should return 0 when key does not exist",
-            !kv_store_key_exists(kv, "fdsafdsa"));
+            !kv_store_key_exists(kv, "fdsafdsa").integer);
   delete_kv_store(kv);
   return 0;
 }
@@ -46,9 +46,9 @@ static char *test_kv_delete() {
   kv_store_add(kv, "ab", "yoyo");
   kv_store_delete(kv, "a");
   mu_assert("kv_store_delete should delete element from store",
-            !kv_store_key_exists(kv, "a"));
+            !kv_store_key_exists(kv, "a").integer);
   mu_assert("Deleting same key twice should be fine",
-            kv_store_delete(kv, "a") == 0);
+            kv_store_delete(kv, "a").integer == 0);
   delete_kv_store(kv);
   return 0;
 }
@@ -58,15 +58,15 @@ static char *test_kv_increment() {
   kv_store_add(kv, "counter", "123");
   kv_store_increment(kv, "counter");
   mu_assert("kv_store_increment should increment integers",
-            strcmp(kv_store_get(kv, "counter"), "124") == 0);
+            strcmp(kv_store_get(kv, "counter").string, "124") == 0);
 
   kv_store_increment(kv, "a");
   mu_assert("kv_store_increment should create new keys if key does not exist",
-            strcmp(kv_store_get(kv, "a"), "1") == 0);
+            strcmp(kv_store_get(kv, "a").string, "1") == 0);
 
   kv_store_add(kv, "string", "hello world");
   mu_assert("kv_store increment should return error if value is not an integer",
-            kv_store_increment(kv, "string") == -1);
+            kv_store_increment(kv, "string").type == ERR_RETURN);
   return 0;
 }
 
