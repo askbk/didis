@@ -14,10 +14,10 @@ typedef struct KeyValueStore {
 
 KeyValueStore *new_kv_store(void);
 void delete_kv_store(KeyValueStore *kvs);
-ReturnValue kv_store_add(KeyValueStore *kvs, kv_key key, kv_value value);
-ReturnValue kv_store_get(KeyValueStore *kvs, kv_key key);
+ReturnValue strings_set(KeyValueStore *kvs, kv_key key, kv_value value);
+ReturnValue strings_get(KeyValueStore *kvs, kv_key key);
 ReturnValue kv_store_key_exists(KeyValueStore *kvs, kv_key key);
-ReturnValue kv_store_delete(KeyValueStore *kvs, kv_key key);
-ReturnValue kv_store_increment(KeyValueStore *kvs, kv_key key);
+ReturnValue strings_delete(KeyValueStore *kvs, kv_key key);
+ReturnValue strings_increment(KeyValueStore *kvs, kv_key key);
 
 #endif

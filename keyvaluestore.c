@@ -39,7 +39,7 @@ static int kv_store_find_key_index(KeyValueStore *kv, kv_key key) {
   return -1;
 }
 
-ReturnValue kv_store_add(KeyValueStore *kv, kv_key key, kv_value value) {
+ReturnValue strings_set(KeyValueStore *kv, kv_key key, kv_value value) {
   int existing_key_index = kv_store_find_key_index(kv, key);
 
   if (existing_key_index >= 0) {
@@ -64,7 +64,7 @@ ReturnValue kv_store_add(KeyValueStore *kv, kv_key key, kv_value value) {
   return make_ok();
 }
 
-ReturnValue kv_store_get(KeyValueStore *kv, kv_key key) {
+ReturnValue strings_get(KeyValueStore *kv, kv_key key) {
   int key_index = kv_store_find_key_index(kv, key);
   if (key_index == -1) return make_nil();
   return make_string(kv->values[key_index]);
@@ -74,7 +74,7 @@ ReturnValue kv_store_key_exists(KeyValueStore *kv, kv_key key) {
   return make_integer(kv_store_find_key_index(kv, key) >= 0);
 }
 
-ReturnValue kv_store_delete(KeyValueStore *kv, kv_key key) {
+ReturnValue strings_delete(KeyValueStore *kv, kv_key key) {
   int key_index = kv_store_find_key_index(kv, key);
   if (key_index < 0) return make_integer(0);
 
@@ -93,11 +93,11 @@ ReturnValue kv_store_delete(KeyValueStore *kv, kv_key key) {
   return make_integer(1);
 }
 
-ReturnValue kv_store_increment(KeyValueStore *kv, kv_key key) {
+ReturnValue strings_increment(KeyValueStore *kv, kv_key key) {
   int index = kv_store_find_key_index(kv, key);
 
   if (index < 0) {
-    kv_store_add(kv, key, "1");
+    strings_set(kv, key, "1");
     return make_integer(1);
   }
 
