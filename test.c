@@ -73,9 +73,12 @@ static char *test_kv_increment() {
 
 static char *test_ls_lpush() {
   ListStore *ls = new_list_store();
+  mu_assert("non-existing lists should have lengt 0",
+            list_store_length(ls, "fdsfodj").integer == 0);
   mu_assert("list_store_lpush should increase list length",
             list_store_lpush(ls, "mylist", "hello world").integer == 1);
-
+  mu_assert("list_store_length should return list length",
+            list_store_length(ls, "mylist").integer == 1);
   delete_list_store(ls);
   return 0;
 }

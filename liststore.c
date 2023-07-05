@@ -92,3 +92,9 @@ ReturnValue list_store_lpush(ListStore* ls, char* list_name, char* value) {
   list_lpush(list, value);
   return make_integer(list->length);
 }
+
+ReturnValue list_store_length(ListStore* ls, char* list_name) {
+  int index = find_key_index(ls, list_name);
+  if (index == -1) return make_integer(0);
+  return make_integer(ls->lists[index]->length);
+}
