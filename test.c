@@ -3,6 +3,7 @@
 #include "minunit.h"
 #include "keyvaluestore.h"
 #include "liststore.h"
+#include "strings.h"
 
 int tests_run = 0;
 
