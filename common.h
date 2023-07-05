@@ -6,7 +6,7 @@ typedef char *kv_value;
 
 enum return_type { ERR_RETURN, STR_RETURN, INT_RETURN, OK_RETURN, NIL_RETURN };
 
-typedef struct {
+typedef struct ReturnValue {
   enum return_type type;
 
   char *string;

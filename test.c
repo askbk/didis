@@ -2,6 +2,7 @@
 #include <string.h>
 #include "minunit.h"
 #include "keyvaluestore.h"
+#include "liststore.h"
 
 int tests_run = 0;
 
@@ -70,12 +71,23 @@ static char *test_kv_increment() {
   return 0;
 }
 
+static char *test_ls_lpush() {
+  ListStore *ls = new_list_store();
+  mu_assert("list_store_lpush should increase list length",
+            list_store_lpush(ls, "mylist", "hello world").integer == 1);
+
+  delete_list_store(ls);
+  return 0;
+}
+
 static char *all_tests() {
   mu_run_test(test_kv_add);
   mu_run_test(test_kv_get);
   mu_run_test(test_kv_exists);
   mu_run_test(test_kv_delete);
   mu_run_test(test_kv_increment);
+
+  mu_run_test(test_ls_lpush);
   return 0;
 }
 

@@ -6,7 +6,7 @@
 typedef char *kv_key;
 typedef char *kv_value;
 
-typedef struct {
+typedef struct KeyValueStore {
   kv_key *keys;
   kv_value *values;
   int size;
