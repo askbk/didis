@@ -54,24 +54,7 @@ ReturnValue strings_get(KeyValueStore *kv, kv_key key) {
 }
 
 ReturnValue strings_delete(KeyValueStore *kv, kv_key key) {
-  return kv_store_delete_entry(kv, key);
-  /*int key_index = kv_store_find_key_index(kv, key);
-  if (key_index < 0)
-    return make_integer(0);
-
-  if (key_index < kv->size - 1) {
-    memmove(&kv->keys[key_index], &kv->keys[key_index + 1],
-            sizeof(kv_key) * (kv->size - key_index - 1));
-    memmove(&kv->values[key_index], &kv->values[key_index + 1],
-            sizeof(char *) * (kv->size - key_index - 1));
-  }
-
-  --(kv->size);
-
-  kv->keys = realloc(kv->keys, kv->size * sizeof(kv_key));
-  kv->values = realloc(kv->values, kv->size * sizeof(kv_value));
-
-  return make_integer(1);*/
+  return make_integer(kv_store_delete_entry(kv, key));
 }
 
 ReturnValue strings_increment(KeyValueStore *kv, kv_key key) {
