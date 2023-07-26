@@ -67,6 +67,8 @@ void kv_store_set_entry(KeyValueStore *kv, kv_key key, Datastructure *value) {
   int existing_key_index = kv_store_find_key_index(kv, key);
 
   if (existing_key_index >= 0) {
+    kv->datastructures[existing_key_index]->free(
+        kv->datastructures[existing_key_index]);
     kv->datastructures[existing_key_index] = value;
     return;
   }
@@ -89,6 +91,9 @@ ReturnValue kv_store_delete_entry(KeyValueStore *kv, kv_key key) {
   int key_index = kv_store_find_key_index(kv, key);
   if (key_index < 0)
     return make_integer(0);
+
+  kv->datastructures[key_index]->free(kv->datastructures[key_index]);
+  free(kv->keys[key_index]);
 
   if (key_index < kv->size - 1) {
     memmove(&kv->keys[key_index], &kv->keys[key_index + 1],
