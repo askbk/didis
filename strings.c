@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void string_free(Datastructure *string_datastructure) {
+void strings_free(Datastructure *string_datastructure) {
   free(string_datastructure->data);
 }
 
@@ -14,36 +14,13 @@ Datastructure *make_string_datastructure(char *string) {
   v->data = malloc(strlen(string) + 1);
   strcpy(v->data, string);
   v->type = STRING;
-  v->free = string_free;
+  v->free = strings_free;
   return v;
 }
 
 ReturnValue strings_set(KeyValueStore *kv, kv_key key, char *value) {
   kv_store_set_entry(kv, key, make_string_datastructure(value));
   return make_ok();
-  /*int existing_key_index = kv_store_find_key_index(kv, key);
-
-  if (existing_key_index >= 0) {
-    kv->datastructures[existing_key_index].data =
-        realloc(kv->datastructures[existing_key_index].data, strlen(value) + 1);
-    strcpy(kv->datastructures[existing_key_index].data, value);
-    return make_ok();
-  }
-
-  ++(kv->size);
-  kv->keys = realloc(kv->keys, sizeof(char *) * kv->size);
-  kv->values = realloc(kv->datastructure, sizeof(char *) * kv->size);
-
-  int index = kv->size - 1;
-
-  kv->keys[index] = malloc(strlen(key) + 1);
-  kv->values[index] = malloc(strlen(value) + 1);
-
-  strcpy(kv->keys[index], key);
-  strcpy(kv->values[index], value);
-
-  return make_ok();
-  */
 }
 
 ReturnValue strings_get(KeyValueStore *kv, kv_key key) {
