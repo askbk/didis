@@ -1,22 +1,38 @@
+#include "strings.h"
+#include "common.h"
+#include "keyvaluestore.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "strings.h"
-#include "keyvaluestore.h"
 
-ReturnValue strings_set(KeyValueStore *kv, kv_key key, kv_value value) {
-  int existing_key_index = kv_store_find_key_index(kv, key);
+void string_free(Datastructure *string_datastructure) {
+  free(string_datastructure->data);
+}
+
+Datastructure *make_string_datastructure(char *string) {
+  Datastructure *v = malloc(sizeof(*v));
+  v->data = malloc(strlen(string) + 1);
+  strcpy(v->data, string);
+  v->type = STRING;
+  v->free = string_free;
+  return v;
+}
+
+ReturnValue strings_set(KeyValueStore *kv, kv_key key, char *value) {
+  kv_store_set_entry(kv, key, make_string_datastructure(value));
+  return make_ok();
+  /*int existing_key_index = kv_store_find_key_index(kv, key);
 
   if (existing_key_index >= 0) {
-    kv->values[existing_key_index] =
-        realloc(kv->values[existing_key_index], strlen(value) + 1);
-    strcpy(kv->values[existing_key_index], value);
+    kv->datastructures[existing_key_index].data =
+        realloc(kv->datastructures[existing_key_index].data, strlen(value) + 1);
+    strcpy(kv->datastructures[existing_key_index].data, value);
     return make_ok();
   }
 
   ++(kv->size);
   kv->keys = realloc(kv->keys, sizeof(char *) * kv->size);
-  kv->values = realloc(kv->values, sizeof(char *) * kv->size);
+  kv->values = realloc(kv->datastructure, sizeof(char *) * kv->size);
 
   int index = kv->size - 1;
 
@@ -27,23 +43,27 @@ ReturnValue strings_set(KeyValueStore *kv, kv_key key, kv_value value) {
   strcpy(kv->values[index], value);
 
   return make_ok();
+  */
 }
 
 ReturnValue strings_get(KeyValueStore *kv, kv_key key) {
   int key_index = kv_store_find_key_index(kv, key);
-  if (key_index == -1) return make_nil();
-  return make_string(kv->values[key_index]);
+  if (key_index == -1)
+    return make_nil();
+  return make_string(kv->datastructures[key_index]->data);
 }
 
 ReturnValue strings_delete(KeyValueStore *kv, kv_key key) {
-  int key_index = kv_store_find_key_index(kv, key);
-  if (key_index < 0) return make_integer(0);
+  return kv_store_delete_entry(kv, key);
+  /*int key_index = kv_store_find_key_index(kv, key);
+  if (key_index < 0)
+    return make_integer(0);
 
   if (key_index < kv->size - 1) {
     memmove(&kv->keys[key_index], &kv->keys[key_index + 1],
             sizeof(kv_key) * (kv->size - key_index - 1));
     memmove(&kv->values[key_index], &kv->values[key_index + 1],
-            sizeof(kv_value) * (kv->size - key_index - 1));
+            sizeof(char *) * (kv->size - key_index - 1));
   }
 
   --(kv->size);
@@ -51,7 +71,7 @@ ReturnValue strings_delete(KeyValueStore *kv, kv_key key) {
   kv->keys = realloc(kv->keys, kv->size * sizeof(kv_key));
   kv->values = realloc(kv->values, kv->size * sizeof(kv_value));
 
-  return make_integer(1);
+  return make_integer(1);*/
 }
 
 ReturnValue strings_increment(KeyValueStore *kv, kv_key key) {
@@ -63,8 +83,9 @@ ReturnValue strings_increment(KeyValueStore *kv, kv_key key) {
   }
 
   char *badchar;
-  long incremented = strtol(kv->values[index], &badchar, 10) + 1;
-  if (*badchar != '\0') return make_error("Cannot increment non-integer");
-  sprintf(kv->values[index], "%ld", incremented);
+  long incremented = strtol(kv->datastructures[index]->data, &badchar, 10) + 1;
+  if (*badchar != '\0')
+    return make_error("Cannot increment non-integer");
+  sprintf(kv->datastructures[index]->data, "%ld", incremented);
   return make_integer(incremented);
 }
