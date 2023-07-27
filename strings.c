@@ -5,11 +5,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-void strings_free(Datastructure *string_datastructure) {
+static void strings_free(Datastructure *string_datastructure) {
   free(string_datastructure->data);
 }
 
-Datastructure *make_string_datastructure(char *string) {
+static Datastructure *make_string_datastructure(char *string) {
   Datastructure *v = malloc(sizeof(*v));
   v->data = malloc(strlen(string) + 1);
   strcpy(v->data, string);

@@ -1,9 +1,9 @@
-#include <stdio.h>
-#include <string.h>
-#include "minunit.h"
 #include "keyvaluestore.h"
 #include "liststore.h"
+#include "minunit.h"
 #include "strings.h"
+#include <stdio.h>
+#include <string.h>
 
 int tests_run = 0;
 
@@ -73,14 +73,14 @@ static char *test_kv_increment() {
 }
 
 static char *test_ls_lpush() {
-  ListStore *ls = new_list_store();
+  KeyValueStore *kv = new_kv_store();
   mu_assert("non-existing lists should have lengt 0",
-            list_store_length(ls, "fdsfodj").integer == 0);
-  mu_assert("list_store_lpush should increase list length",
-            list_store_lpush(ls, "mylist", "hello world").integer == 1);
+            lists_length(kv, "fdsfodj").integer == 0);
+  mu_assert("lists_lpush should increase list length",
+            lists_lpush(kv, "mylist", "hello world").integer == 1);
   mu_assert("list_store_length should return list length",
-            list_store_length(ls, "mylist").integer == 1);
-  delete_list_store(ls);
+            lists_length(kv, "mylist").integer == 1);
+  delete_kv_store(kv);
   return 0;
 }
 
