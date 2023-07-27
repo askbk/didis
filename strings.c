@@ -30,10 +30,6 @@ ReturnValue strings_get(KeyValueStore *kv, kv_key key) {
   return make_string(kv->datastructures[key_index]->data);
 }
 
-ReturnValue strings_delete(KeyValueStore *kv, kv_key key) {
-  return make_integer(kv_store_delete_entry(kv, key));
-}
-
 ReturnValue strings_increment(KeyValueStore *kv, kv_key key) {
   int index = kv_store_find_key_index(kv, key);
 

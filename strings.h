@@ -6,7 +6,6 @@
 
 ReturnValue strings_set(KeyValueStore *kvs, kv_key key, char *value);
 ReturnValue strings_get(KeyValueStore *kvs, kv_key key);
-ReturnValue strings_delete(KeyValueStore *kvs, kv_key key);
 ReturnValue strings_increment(KeyValueStore *kvs, kv_key key);
 
 #endif

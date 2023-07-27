@@ -89,10 +89,10 @@ void kv_store_set_entry(KeyValueStore *kv, kv_key key, Datastructure *value) {
 
 // Deletes an entry from the KeyValueStore. Returns 0 if the entry does not
 // exist, otherwise returns 1.
-int kv_store_delete_entry(KeyValueStore *kv, kv_key key) {
+ReturnValue kv_store_delete_entry(KeyValueStore *kv, kv_key key) {
   int key_index = kv_store_find_key_index(kv, key);
   if (key_index < 0)
-    return 0;
+    return make_integer(0);
 
   kv->datastructures[key_index]->free(kv->datastructures[key_index]);
   free(kv->keys[key_index]);
@@ -110,5 +110,5 @@ int kv_store_delete_entry(KeyValueStore *kv, kv_key key) {
   kv->datastructures =
       realloc(kv->datastructures, kv->size * sizeof(Datastructure));
 
-  return 1;
+  return make_integer(1);
 }

@@ -7,7 +7,7 @@
 
 int tests_run = 0;
 
-static char *test_kv_add() {
+static char *test_strings_set() {
   KeyValueStore *kv = new_kv_store();
   mu_assert("error, nonempty kv store", kv->size == 0);
   strings_set(kv, "a", "hello world");
@@ -18,7 +18,7 @@ static char *test_kv_add() {
   return 0;
 }
 
-static char *test_kv_get() {
+static char *test_strings_get() {
   KeyValueStore *kv = new_kv_store();
   strings_set(kv, "hello", "world");
   char *v = strings_get(kv, "hello").string;
@@ -46,16 +46,16 @@ static char *test_kv_delete() {
   KeyValueStore *kv = new_kv_store();
   strings_set(kv, "a", "hello world");
   strings_set(kv, "ab", "yoyo");
-  strings_delete(kv, "a");
+  kv_store_delete_entry(kv, "a");
   mu_assert("strings_delete should delete element from store",
             !kv_store_key_exists(kv, "a").integer);
   mu_assert("Deleting same key twice should be fine",
-            strings_delete(kv, "a").integer == 0);
+            kv_store_delete_entry(kv, "a").integer == 0);
   delete_kv_store(kv);
   return 0;
 }
 
-static char *test_kv_increment() {
+static char *test_strings_increment() {
   KeyValueStore *kv = new_kv_store();
   strings_set(kv, "counter", "123");
   strings_increment(kv, "counter");
@@ -72,7 +72,7 @@ static char *test_kv_increment() {
   return 0;
 }
 
-static char *test_ls_lpush() {
+static char *test_lists_lpush() {
   KeyValueStore *kv = new_kv_store();
   mu_assert("non-existing lists should have lengt 0",
             lists_length(kv, "fdsfodj").integer == 0);
@@ -85,13 +85,13 @@ static char *test_ls_lpush() {
 }
 
 static char *all_tests() {
-  mu_run_test(test_kv_add);
-  mu_run_test(test_kv_get);
+  mu_run_test(test_strings_set);
+  mu_run_test(test_strings_get);
   mu_run_test(test_kv_exists);
   mu_run_test(test_kv_delete);
-  mu_run_test(test_kv_increment);
+  mu_run_test(test_strings_increment);
 
-  mu_run_test(test_ls_lpush);
+  mu_run_test(test_lists_lpush);
   return 0;
 }
 
