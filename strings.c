@@ -9,7 +9,7 @@ static void strings_free(Datastructure *string_datastructure) {
   free(string_datastructure->data);
 }
 
-static Datastructure *make_string_datastructure(char *string) {
+static Datastructure *make_string_datastructure(element string) {
   Datastructure *v = malloc(sizeof(*v));
   v->data = malloc(strlen(string) + 1);
   strcpy(v->data, string);
@@ -18,7 +18,7 @@ static Datastructure *make_string_datastructure(char *string) {
   return v;
 }
 
-ReturnValue strings_set(KeyValueStore *kv, kv_key key, char *value) {
+ReturnValue strings_set(KeyValueStore *kv, kv_key key, element value) {
   kv_store_set_entry(kv, key, make_string_datastructure(value));
   return make_ok();
 }

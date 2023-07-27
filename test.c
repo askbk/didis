@@ -80,6 +80,7 @@ static char *test_lists_lpush() {
             lists_lpush(kv, "mylist", "hello world").integer == 1);
   mu_assert("list_store_length should return list length",
             lists_length(kv, "mylist").integer == 1);
+
   delete_kv_store(kv);
   return 0;
 }

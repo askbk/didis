@@ -26,7 +26,7 @@ static Datastructure *make_lists_datastructure(List *l) {
   return d;
 }
 
-static ListNode *new_list_node(ListNode *left, ListNode *right, char *value) {
+static ListNode *new_list_node(ListNode *left, ListNode *right, element value) {
   ListNode *node = malloc(sizeof(*node));
   node->left = left;
   node->right = right;
@@ -43,7 +43,7 @@ static List *new_list(void) {
   return list;
 }
 
-static void list_lpush(List *list, char *value) {
+static void list_lpush(List *list, element value) {
   ListNode *n = new_list_node(NULL, list->head, value);
   list->head = n;
   ++(list->length);
@@ -57,7 +57,7 @@ static int lists_add_list(KeyValueStore *kv, char *list_name) {
   return kv_store_find_key_index(kv, list_name);
 }
 
-ReturnValue lists_lpush(KeyValueStore *kv, char *list_name, char *value) {
+ReturnValue lists_lpush(KeyValueStore *kv, char *list_name, element value) {
   int index = kv_store_find_key_index(kv, list_name);
   if (index == -1)
     index = lists_add_list(kv, list_name);

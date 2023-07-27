@@ -4,6 +4,7 @@
 #define KEYVALUESTORE_H
 
 typedef char *kv_key;
+typedef char *element;
 
 typedef struct Datastructure {
   enum datastructure type;
