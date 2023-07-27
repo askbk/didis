@@ -4,7 +4,7 @@ Didis (distant dictionary server) is a reimplementation of Redis for learning/fu
 
 Progress:
 
-- [ ] Strings
+- [x] Strings (basic)
 - [ ] Lists
 - [ ] Sets
 - [ ] Hashes
