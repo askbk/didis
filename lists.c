@@ -54,6 +54,14 @@ static void list_lpush(List *list, element value) {
     list->tail = n;
 }
 
+static void list_rpush(List *list, element value) {
+  ListNode *n = new_list_node(list->tail, NULL, value);
+  list->tail = n;
+  ++(list->length);
+  if (list->length == 1)
+    list->head = n;
+}
+
 static element list_lpop(List *list) {
   ListNode *head = list->head;
   element v = malloc(strlen(list->head->value) + 1);
@@ -62,6 +70,18 @@ static element list_lpop(List *list) {
   list->head->right->left = NULL;
   list->head = list->head->right;
   delete_list_node(head);
+  --(list->length);
+  return v;
+}
+
+static element list_rpop(List *list) {
+  ListNode *tail = list->tail;
+  element v = malloc(strlen(list->tail->value) + 1);
+  strcpy(v, list->tail->value);
+
+  list->tail->left->right = NULL;
+  list->tail = list->tail->left;
+  delete_list_node(tail);
   --(list->length);
   return v;
 }
@@ -81,6 +101,15 @@ ReturnValue lists_lpush(KeyValueStore *kv, kv_key list_name, element value) {
   return make_integer(list->length);
 }
 
+ReturnValue lists_rpush(KeyValueStore *kv, kv_key list_name, element value) {
+  int index = kv_store_find_key_index(kv, list_name);
+  if (index == -1)
+    index = lists_add_list(kv, list_name);
+  List *list = kv->datastructures[index]->data;
+  list_rpush(list, value);
+  return make_integer(list->length);
+}
+
 ReturnValue lists_length(KeyValueStore *kv, kv_key list_name) {
   int index = kv_store_find_key_index(kv, list_name);
   if (index == -1)
@@ -93,4 +122,10 @@ ReturnValue lists_lpop(KeyValueStore *kvs, kv_key list_name) {
   Datastructure *d = kv_store_get_entry(kvs, list_name);
   List *l = d->data;
   return make_string(list_lpop(l));
+}
+
+ReturnValue lists_rpop(KeyValueStore *kvs, kv_key list_name) {
+  Datastructure *d = kv_store_get_entry(kvs, list_name);
+  List *l = d->data;
+  return make_string(list_rpop(l));
 }

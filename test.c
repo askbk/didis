@@ -72,7 +72,7 @@ static char *test_strings_increment() {
   return 0;
 }
 
-static char *test_lists_lpush() {
+static char *test_lists_lpush_lpop() {
   KeyValueStore *kv = new_kv_store();
   mu_assert("non-existing lists should have lengt 0",
             lists_length(kv, "fdsfodj").integer == 0);
@@ -93,6 +93,23 @@ static char *test_lists_lpush() {
   return 0;
 }
 
+static char *test_lists_rpush_rpop() {
+  KeyValueStore *kv = new_kv_store();
+  mu_assert("lists_rpush should increase list length",
+            lists_rpush(kv, "mylist", "hello world").integer == 1);
+
+  lists_rpush(kv, "mylist", "a");
+  lists_rpush(kv, "mylist", "b");
+
+  mu_assert("lists_rpop should return tail of list",
+            strcmp(lists_rpop(kv, "mylist").string, "b") == 0);
+
+  mu_assert("lists_rpop should reduce list length",
+            lists_length(kv, "mylist").integer == 2);
+  delete_kv_store(kv);
+  return 0;
+}
+
 static char *all_tests() {
   mu_run_test(test_strings_set);
   mu_run_test(test_strings_get);
@@ -100,7 +117,9 @@ static char *all_tests() {
   mu_run_test(test_kv_delete);
   mu_run_test(test_strings_increment);
 
-  mu_run_test(test_lists_lpush);
+  mu_run_test(test_lists_lpush_lpop);
+  mu_run_test(test_lists_rpush_rpop);
+
   return 0;
 }
 
