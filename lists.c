@@ -1,5 +1,4 @@
 #include "lists.h"
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -29,7 +28,11 @@ static Datastructure *make_lists_datastructure(List *l) {
 static ListNode *new_list_node(ListNode *left, ListNode *right, element value) {
   ListNode *node = malloc(sizeof(*node));
   node->left = left;
+  if (left)
+    left->right = node;
   node->right = right;
+  if (right)
+    right->left = node;
   node->value = malloc(strlen(value) + 1);
   strcpy(node->value, value);
   return node;
@@ -51,13 +54,25 @@ static void list_lpush(List *list, element value) {
     list->tail = n;
 }
 
-static int lists_add_list(KeyValueStore *kv, char *list_name) {
+static element list_lpop(List *list) {
+  ListNode *head = list->head;
+  element v = malloc(strlen(list->head->value) + 1);
+  strcpy(v, list->head->value);
+
+  list->head->right->left = NULL;
+  list->head = list->head->right;
+  delete_list_node(head);
+  --(list->length);
+  return v;
+}
+
+static int lists_add_list(KeyValueStore *kv, kv_key list_name) {
   Datastructure *d = make_lists_datastructure(new_list());
   kv_store_set_entry(kv, list_name, d);
   return kv_store_find_key_index(kv, list_name);
 }
 
-ReturnValue lists_lpush(KeyValueStore *kv, char *list_name, element value) {
+ReturnValue lists_lpush(KeyValueStore *kv, kv_key list_name, element value) {
   int index = kv_store_find_key_index(kv, list_name);
   if (index == -1)
     index = lists_add_list(kv, list_name);
@@ -66,10 +81,16 @@ ReturnValue lists_lpush(KeyValueStore *kv, char *list_name, element value) {
   return make_integer(list->length);
 }
 
-ReturnValue lists_length(KeyValueStore *kv, char *list_name) {
+ReturnValue lists_length(KeyValueStore *kv, kv_key list_name) {
   int index = kv_store_find_key_index(kv, list_name);
   if (index == -1)
     return make_integer(0);
   List *list = kv->datastructures[index]->data;
   return make_integer(list->length);
+}
+
+ReturnValue lists_lpop(KeyValueStore *kvs, kv_key list_name) {
+  Datastructure *d = kv_store_get_entry(kvs, list_name);
+  List *l = d->data;
+  return make_string(list_lpop(l));
 }

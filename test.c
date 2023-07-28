@@ -81,6 +81,14 @@ static char *test_lists_lpush() {
   mu_assert("list_store_length should return list length",
             lists_length(kv, "mylist").integer == 1);
 
+  lists_lpush(kv, "mylist", "a");
+  lists_lpush(kv, "mylist", "b");
+
+  mu_assert("lists_lpop should return head of list",
+            strcmp(lists_lpop(kv, "mylist").string, "b") == 0);
+
+  mu_assert("lists_lpop should reduce list length",
+            lists_length(kv, "mylist").integer == 2);
   delete_kv_store(kv);
   return 0;
 }
