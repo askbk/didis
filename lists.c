@@ -85,7 +85,7 @@ static element list_lpop(List *list) { return list_pop(list, LEFT); }
 
 static element list_rpop(List *list) { return list_pop(list, RIGHT); }
 
-Datastructure *lists_add_list(KeyValueStore *kv, kv_key list_name) {
+static Datastructure *lists_add_list(KeyValueStore *kv, kv_key list_name) {
   Datastructure *d = make_lists_datastructure(new_list());
   kv_store_set_entry(kv, list_name, d);
   return kv_store_get_entry(kv, list_name);
