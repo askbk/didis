@@ -98,7 +98,7 @@ static ReturnValue lists_push(KeyValueStore *kv, kv_key list_name,
   if (d == NULL)
     d = lists_add_list(kv, list_name);
   else if (d->type != LIST)
-    return make_error("Incorrect type!");
+    return make_error(TYPE_ERROR_MSG);
   List *list = d->data;
   if (whereto == LEFT)
     list_lpush(list, value);
@@ -140,7 +140,7 @@ static ReturnValue lists_pop(KeyValueStore *kvs, kv_key list_name,
   if (d == NULL)
     return make_nil();
   if (d->type != LIST)
-    return make_error("incorrect type");
+    return make_error(TYPE_ERROR_MSG);
   List *l = d->data;
   return make_string(list_pop(l, wherefrom));
 }
@@ -159,7 +159,7 @@ ReturnValue lists_move(KeyValueStore *kvs, kv_key src_key, kv_key dest_key,
   if (d == NULL)
     return make_nil();
   if (d->type != LIST)
-    return make_error("incorrect type");
+    return make_error(TYPE_ERROR_MSG);
   List *src = d->data;
   if (is_empty_list(src))
     return make_nil();

@@ -1,6 +1,9 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#define TYPE_ERROR_MSG                                                         \
+  "WRONGTYPE Operation against a key holding the wrong kind of value"
+
 enum return_type { ERR_RETURN, STR_RETURN, INT_RETURN, OK_RETURN, NIL_RETURN };
 enum datastructure { STRING, LIST, NIL };
 

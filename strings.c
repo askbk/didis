@@ -1,4 +1,5 @@
 #include "strings.h"
+#include "common.h"
 #include "keyvaluestore.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,24 +24,26 @@ ReturnValue strings_set(KeyValueStore *kv, kv_key key, element value) {
 }
 
 ReturnValue strings_get(KeyValueStore *kv, kv_key key) {
-  int key_index = kv_store_find_key_index(kv, key);
-  if (key_index == -1)
+  Datastructure *d = kv_store_get_entry(kv, key);
+  if (d == NULL)
     return make_nil();
-  return make_string(kv->datastructures[key_index]->data);
+  if (d->type != STRING)
+    return make_error(TYPE_ERROR_MSG);
+  return make_string(d->data);
 }
 
 ReturnValue strings_increment(KeyValueStore *kv, kv_key key) {
-  int index = kv_store_find_key_index(kv, key);
-
-  if (index < 0) {
+  Datastructure *d = kv_store_get_entry(kv, key);
+  if (d == NULL) {
     strings_set(kv, key, "1");
     return make_integer(1);
   }
-
+  if (d->type != STRING)
+    return make_error(TYPE_ERROR_MSG);
   char *badchar;
-  long incremented = strtol(kv->datastructures[index]->data, &badchar, 10) + 1;
+  long incremented = strtol(d->data, &badchar, 10) + 1;
   if (*badchar != '\0')
     return make_error("Cannot increment non-integer");
-  sprintf(kv->datastructures[index]->data, "%ld", incremented);
+  sprintf(d->data, "%ld", incremented);
   return make_integer(incremented);
 }
