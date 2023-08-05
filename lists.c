@@ -136,7 +136,10 @@ ReturnValue lists_rpop(KeyValueStore *kvs, kv_key list_name) {
 
 ReturnValue lists_move(KeyValueStore *kvs, kv_key src_key, kv_key dest_key,
                        list_end wherefrom, list_end whereto) {
-  List *src = kv_store_get_entry(kvs, src_key)->data;
+  Datastructure *d = kv_store_get_entry(kvs, src_key);
+  if (d == NULL)
+    return make_nil();
+  List *src = d->data;
   if (is_empty_list(src))
     return make_nil();
   element v = list_pop(src, wherefrom);
