@@ -1,4 +1,5 @@
 #include "lists.h"
+#include "common.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -67,8 +68,10 @@ static element list_lpop(List *list) {
   element v = malloc(strlen(list->head->value) + 1);
   strcpy(v, list->head->value);
 
-  list->head->right->left = NULL;
-  list->head = list->head->right;
+  if (list->length > 1) {
+    list->head->right->left = NULL;
+    list->head = list->head->right;
+  }
   delete_list_node(head);
   --(list->length);
   return v;
@@ -79,43 +82,50 @@ static element list_rpop(List *list) {
   element v = malloc(strlen(list->tail->value) + 1);
   strcpy(v, list->tail->value);
 
-  list->tail->left->right = NULL;
-  list->tail = list->tail->left;
+  if (list->length > 1) {
+    list->tail->left->right = NULL;
+    list->tail = list->tail->left;
+  }
   delete_list_node(tail);
   --(list->length);
   return v;
 }
 
-static int lists_add_list(KeyValueStore *kv, kv_key list_name) {
+Datastructure *lists_add_list(KeyValueStore *kv, kv_key list_name) {
   Datastructure *d = make_lists_datastructure(new_list());
   kv_store_set_entry(kv, list_name, d);
-  return kv_store_find_key_index(kv, list_name);
+  return kv_store_get_entry(kv, list_name);
+}
+
+static int is_empty_list(List *l) { return l->length == 0; }
+
+static int lists_push(KeyValueStore *kv, kv_key list_name, element value,
+                      list_end whereto) {
+  Datastructure *d = kv_store_get_entry(kv, list_name);
+  if (d == NULL)
+    d = lists_add_list(kv, list_name);
+  List *list = d->data;
+  if (whereto == LEFT)
+    list_lpush(list, value);
+  else
+    list_rpush(list, value);
+  return list->length;
 }
 
 ReturnValue lists_lpush(KeyValueStore *kv, kv_key list_name, element value) {
-  int index = kv_store_find_key_index(kv, list_name);
-  if (index == -1)
-    index = lists_add_list(kv, list_name);
-  List *list = kv->datastructures[index]->data;
-  list_lpush(list, value);
-  return make_integer(list->length);
+  return make_integer(lists_push(kv, list_name, value, LEFT));
 }
 
 ReturnValue lists_rpush(KeyValueStore *kv, kv_key list_name, element value) {
-  int index = kv_store_find_key_index(kv, list_name);
-  if (index == -1)
-    index = lists_add_list(kv, list_name);
-  List *list = kv->datastructures[index]->data;
-  list_rpush(list, value);
-  return make_integer(list->length);
+  return make_integer(lists_push(kv, list_name, value, RIGHT));
 }
 
 ReturnValue lists_length(KeyValueStore *kv, kv_key list_name) {
-  int index = kv_store_find_key_index(kv, list_name);
-  if (index == -1)
+  Datastructure *d = kv_store_get_entry(kv, list_name);
+  if (d == NULL)
     return make_integer(0);
-  List *list = kv->datastructures[index]->data;
-  return make_integer(list->length);
+  List *l = d->data;
+  return make_integer(l->length);
 }
 
 ReturnValue lists_lpop(KeyValueStore *kvs, kv_key list_name) {
@@ -128,4 +138,20 @@ ReturnValue lists_rpop(KeyValueStore *kvs, kv_key list_name) {
   Datastructure *d = kv_store_get_entry(kvs, list_name);
   List *l = d->data;
   return make_string(list_rpop(l));
+}
+
+ReturnValue lists_move(KeyValueStore *kvs, kv_key src_key, kv_key dest_key,
+                       list_end wherefrom, list_end whereto) {
+  List *src = kv_store_get_entry(kvs, src_key)->data;
+
+  if (is_empty_list(src))
+    return make_nil();
+
+  List *dest = kv_store_get_entry(kvs, dest_key)->data;
+  element v = wherefrom == LEFT ? list_lpop(src) : list_rpop(src);
+  if (whereto == LEFT)
+    list_lpush(dest, v);
+  else
+    list_rpush(dest, v);
+  return make_string(v);
 }

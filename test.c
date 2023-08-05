@@ -110,6 +110,24 @@ static char *test_lists_rpush_rpop() {
   return 0;
 }
 
+static char *test_lists_move() {
+  KeyValueStore *kv = new_kv_store();
+  // list1: a
+  // list2: b, c
+  // move list1 list2 left left -> list2: a, b, c. list1: empty
+  lists_rpush(kv, "list1", "a");
+  lists_rpush(kv, "list2", "b");
+  lists_rpush(kv, "list2", "c");
+  mu_assert("lists_move should return the element being popped/pushed",
+            strcmp(lists_move(kv, "list1", "list2", LEFT, LEFT).string, "a") ==
+                0);
+  mu_assert("lists_move should remove the element from the source list",
+            lists_length(kv, "list1").integer == 0);
+  mu_assert("lists_move should add the element to the destination list at the "
+            "specified end",
+            strcmp(lists_lpop(kv, "list2").string, "a") == 0);
+  return 0;
+}
 static char *all_tests() {
   mu_run_test(test_strings_set);
   mu_run_test(test_strings_get);
@@ -119,7 +137,7 @@ static char *all_tests() {
 
   mu_run_test(test_lists_lpush_lpop);
   mu_run_test(test_lists_rpush_rpop);
-
+  mu_run_test(test_lists_move);
   return 0;
 }
 

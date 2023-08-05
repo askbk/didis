@@ -56,9 +56,11 @@ ReturnValue kv_store_key_exists(KeyValueStore *kv, kv_key key) {
   return make_integer(kv_store_find_key_index(kv, key) >= 0);
 }
 
+// Returns the kv store datastructure or NULL if key does not exist
 Datastructure *kv_store_get_entry(KeyValueStore *kvs, kv_key key) {
   int index = kv_store_find_key_index(kvs, key);
-
+  if (index == -1)
+    return NULL;
   return kvs->datastructures[index];
 }
 

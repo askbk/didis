@@ -4,6 +4,8 @@
 #ifndef LISTS_H
 #define LISTS_H
 
+typedef enum { LEFT, RIGHT } list_end;
+
 typedef struct ListNode {
   struct ListNode *left;
   struct ListNode *right;
@@ -22,7 +24,7 @@ ReturnValue lists_rpush(KeyValueStore *kvs, kv_key list_name, element v);
 ReturnValue lists_rpop(KeyValueStore *kvs, kv_key list_name);
 ReturnValue lists_length(KeyValueStore *kvs, kv_key list_name);
 ReturnValue lists_move(KeyValueStore *kvs, kv_key source, kv_key destination,
-                       int wherefrom, int whereto);
+                       list_end wherefrom, list_end whereto);
 ReturnValue lists_trim(KeyValueStore *kvs, kv_key list_name, int start,
                        int end);
 
