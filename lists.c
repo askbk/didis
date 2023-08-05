@@ -62,34 +62,28 @@ static void list_rpush(List *list, element value) {
   if (list->length == 1)
     list->head = n;
 }
+static element list_pop(List *list, list_end wherefrom) {
+  ListNode *end = wherefrom == LEFT ? list->head : list->tail;
 
-static element list_lpop(List *list) {
-  ListNode *head = list->head;
-  element v = malloc(strlen(list->head->value) + 1);
-  strcpy(v, list->head->value);
+  element v = malloc(strlen(end->value) + 1);
+  strcpy(v, end->value);
 
   if (list->length > 1) {
-    list->head->right->left = NULL;
-    list->head = list->head->right;
+    if (wherefrom == LEFT) {
+      end->right->left = NULL;
+      list->head = list->head->right;
+    } else {
+      end->left->right = NULL;
+      list->tail = list->tail->left;
+    }
   }
-  delete_list_node(head);
+  delete_list_node(end);
   --(list->length);
   return v;
 }
+static element list_lpop(List *list) { return list_pop(list, LEFT); }
 
-static element list_rpop(List *list) {
-  ListNode *tail = list->tail;
-  element v = malloc(strlen(list->tail->value) + 1);
-  strcpy(v, list->tail->value);
-
-  if (list->length > 1) {
-    list->tail->left->right = NULL;
-    list->tail = list->tail->left;
-  }
-  delete_list_node(tail);
-  --(list->length);
-  return v;
-}
+static element list_rpop(List *list) { return list_pop(list, RIGHT); }
 
 Datastructure *lists_add_list(KeyValueStore *kv, kv_key list_name) {
   Datastructure *d = make_lists_datastructure(new_list());
