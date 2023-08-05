@@ -1,3 +1,4 @@
+#include "common.h"
 #include "keyvaluestore.h"
 #include "lists.h"
 #include "minunit.h"
@@ -128,6 +129,15 @@ static char *test_lists_move() {
             strcmp(lists_lpop(kv, "list2").string, "a") == 0);
   return 0;
 }
+
+static char *test_incorrect_type_handling() {
+  KeyValueStore *kv = new_kv_store();
+  strings_set(kv, "string1", "hwllo");
+  mu_assert("calling function on wrong datastructure should return error",
+            lists_rpush(kv, "string1", "test").type == ERR_RETURN);
+  return 0;
+}
+
 static char *all_tests() {
   mu_run_test(test_strings_set);
   mu_run_test(test_strings_get);
@@ -138,6 +148,8 @@ static char *all_tests() {
   mu_run_test(test_lists_lpush_lpop);
   mu_run_test(test_lists_rpush_rpop);
   mu_run_test(test_lists_move);
+
+  mu_run_test(test_incorrect_type_handling);
   return 0;
 }
 

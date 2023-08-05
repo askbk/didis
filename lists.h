@@ -18,6 +18,7 @@ typedef struct {
   int length;
 } List;
 
+void lists_print(KeyValueStore *kvs, kv_key list_name);
 ReturnValue lists_lpush(KeyValueStore *kvs, kv_key list_name, element v);
 ReturnValue lists_lpop(KeyValueStore *kvs, kv_key list_name);
 ReturnValue lists_rpush(KeyValueStore *kvs, kv_key list_name, element v);

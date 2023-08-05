@@ -1,5 +1,6 @@
 #include "lists.h"
 #include "common.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -23,6 +24,7 @@ static Datastructure *make_lists_datastructure(List *l) {
   Datastructure *d = malloc(sizeof(*d));
   d->data = l;
   d->free = lists_free;
+  d->type = LIST;
   return d;
 }
 
@@ -81,9 +83,6 @@ static element list_pop(List *list, list_end wherefrom) {
   --(list->length);
   return v;
 }
-static element list_lpop(List *list) { return list_pop(list, LEFT); }
-
-static element list_rpop(List *list) { return list_pop(list, RIGHT); }
 
 static Datastructure *lists_add_list(KeyValueStore *kv, kv_key list_name) {
   Datastructure *d = make_lists_datastructure(new_list());
@@ -93,25 +92,38 @@ static Datastructure *lists_add_list(KeyValueStore *kv, kv_key list_name) {
 
 static int is_empty_list(List *l) { return l->length == 0; }
 
-static int lists_push(KeyValueStore *kv, kv_key list_name, element value,
-                      list_end whereto) {
+static ReturnValue lists_push(KeyValueStore *kv, kv_key list_name,
+                              element value, list_end whereto) {
   Datastructure *d = kv_store_get_entry(kv, list_name);
   if (d == NULL)
     d = lists_add_list(kv, list_name);
+  else if (d->type != LIST)
+    return make_error("Incorrect type!");
   List *list = d->data;
   if (whereto == LEFT)
     list_lpush(list, value);
   else
     list_rpush(list, value);
-  return list->length;
+  return make_integer(list->length);
+}
+
+void lists_print(KeyValueStore *kvs, kv_key list_name) {
+  List *l = kv_store_get_entry(kvs, list_name)->data;
+  printf("[");
+  ListNode *n = l->head;
+  while (n) {
+    printf("%s, ", n->value);
+    n = n->right;
+  }
+  printf("]\n");
 }
 
 ReturnValue lists_lpush(KeyValueStore *kv, kv_key list_name, element value) {
-  return make_integer(lists_push(kv, list_name, value, LEFT));
+  return lists_push(kv, list_name, value, LEFT);
 }
 
 ReturnValue lists_rpush(KeyValueStore *kv, kv_key list_name, element value) {
-  return make_integer(lists_push(kv, list_name, value, RIGHT));
+  return lists_push(kv, list_name, value, RIGHT);
 }
 
 ReturnValue lists_length(KeyValueStore *kv, kv_key list_name) {
@@ -122,16 +134,23 @@ ReturnValue lists_length(KeyValueStore *kv, kv_key list_name) {
   return make_integer(l->length);
 }
 
-ReturnValue lists_lpop(KeyValueStore *kvs, kv_key list_name) {
+static ReturnValue lists_pop(KeyValueStore *kvs, kv_key list_name,
+                             list_end wherefrom) {
   Datastructure *d = kv_store_get_entry(kvs, list_name);
+  if (d == NULL)
+    return make_nil();
+  if (d->type != LIST)
+    return make_error("incorrect type");
   List *l = d->data;
-  return make_string(list_lpop(l));
+  return make_string(list_pop(l, wherefrom));
+}
+
+ReturnValue lists_lpop(KeyValueStore *kvs, kv_key list_name) {
+  return lists_pop(kvs, list_name, LEFT);
 }
 
 ReturnValue lists_rpop(KeyValueStore *kvs, kv_key list_name) {
-  Datastructure *d = kv_store_get_entry(kvs, list_name);
-  List *l = d->data;
-  return make_string(list_rpop(l));
+  return lists_pop(kvs, list_name, RIGHT);
 }
 
 ReturnValue lists_move(KeyValueStore *kvs, kv_key src_key, kv_key dest_key,
@@ -139,6 +158,8 @@ ReturnValue lists_move(KeyValueStore *kvs, kv_key src_key, kv_key dest_key,
   Datastructure *d = kv_store_get_entry(kvs, src_key);
   if (d == NULL)
     return make_nil();
+  if (d->type != LIST)
+    return make_error("incorrect type");
   List *src = d->data;
   if (is_empty_list(src))
     return make_nil();
