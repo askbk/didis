@@ -137,15 +137,9 @@ ReturnValue lists_rpop(KeyValueStore *kvs, kv_key list_name) {
 ReturnValue lists_move(KeyValueStore *kvs, kv_key src_key, kv_key dest_key,
                        list_end wherefrom, list_end whereto) {
   List *src = kv_store_get_entry(kvs, src_key)->data;
-
   if (is_empty_list(src))
     return make_nil();
-
-  List *dest = kv_store_get_entry(kvs, dest_key)->data;
-  element v = wherefrom == LEFT ? list_lpop(src) : list_rpop(src);
-  if (whereto == LEFT)
-    list_lpush(dest, v);
-  else
-    list_rpush(dest, v);
+  element v = list_pop(src, wherefrom);
+  lists_push(kvs, dest_key, v, whereto);
   return make_string(v);
 }
