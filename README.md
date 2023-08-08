@@ -4,8 +4,9 @@ Didis (distant dictionary server) is a reimplementation of Redis for learning/fu
 
 Progress:
 
-- [x] Strings (GET, SET, INCR)
-- [x] Lists (LPUSH, LPOP, RPUSH, RPOP, LLEN, LMOVE)
+- [x] Key-value operations (`DEL`, `EXISTS`)
+- [x] Strings (`GET`, `SET`, `INCR`)
+- [x] Lists (`LPUSH`, `LPOP`, `RPUSH`, `RPOP`, `LLEN`, `LMOVE`)
 - [ ] Sets
 - [ ] Wider characters (UTF8?)
 - [ ] Hashes
