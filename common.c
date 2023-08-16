@@ -24,3 +24,6 @@ ReturnValue make_error(char *error) {
   ReturnValue r = {.type = ERR_RETURN, .error_message = error};
   return r;
 }
+
+int min(int a, int b) { return a < b ? a : b; }
+int max(int a, int b) { return a > b ? a : b; }

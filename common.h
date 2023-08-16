@@ -20,5 +20,7 @@ ReturnValue make_integer(long integer);
 ReturnValue make_nil();
 ReturnValue make_ok();
 ReturnValue make_error(char *error);
+int min(int a, int b);
+int max(int a, int b);
 
 #endif
