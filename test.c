@@ -138,6 +138,21 @@ static char *test_incorrect_type_handling() {
   return 0;
 }
 
+static char *test_lists_trim() {
+  KeyValueStore *kv = new_kv_store();
+  lists_rpush(kv, "list1", "a");
+  lists_rpush(kv, "list1", "b");
+  lists_rpush(kv, "list1", "c");
+  lists_trim(kv, "list1", 0, 99);
+  mu_assert("lists_trim should not modify list when range includes whole list",
+            lists_length(kv, "list1").integer == 3);
+  lists_trim(kv, "list1", 1, 1);
+  mu_assert("lists_trim should trim list to specified range (inclusive)",
+            lists_length(kv, "list1").integer == 1);
+  lists_trim(kv, "list1", 0, 0);
+  return 0;
+}
+
 static char *all_tests() {
   mu_run_test(test_strings_set);
   mu_run_test(test_strings_get);
@@ -148,6 +163,7 @@ static char *all_tests() {
   mu_run_test(test_lists_lpush_lpop);
   mu_run_test(test_lists_rpush_rpop);
   mu_run_test(test_lists_move);
+  mu_run_test(test_lists_trim);
 
   mu_run_test(test_incorrect_type_handling);
   return 0;

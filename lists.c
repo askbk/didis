@@ -4,11 +4,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Frees the node's allocated memory.
 static void delete_list_node(ListNode *node) {
   free(node->value);
   free(node);
 }
 
+// Frees the list and all its list nodes.
 static void delete_list(List *list) {
   ListNode *n = list->head;
   while ((n = n->right) != NULL) {
@@ -64,6 +66,7 @@ static void list_rpush(List *list, element value) {
   if (list->length == 1)
     list->head = n;
 }
+
 static element list_pop(List *list, list_end wherefrom) {
   ListNode *end = wherefrom == LEFT ? list->head : list->tail;
 
@@ -107,8 +110,7 @@ static ReturnValue lists_push(KeyValueStore *kv, kv_key list_name,
   return make_integer(list->length);
 }
 
-void lists_print(KeyValueStore *kvs, kv_key list_name) {
-  List *l = kv_store_get_entry(kvs, list_name)->data;
+static void print(List *l) {
   printf("[");
   ListNode *n = l->head;
   while (n) {
@@ -116,6 +118,11 @@ void lists_print(KeyValueStore *kvs, kv_key list_name) {
     n = n->right;
   }
   printf("]\n");
+}
+
+void lists_print(KeyValueStore *kvs, kv_key list_name) {
+  List *l = kv_store_get_entry(kvs, list_name)->data;
+  print(l);
 }
 
 ReturnValue lists_lpush(KeyValueStore *kv, kv_key list_name, element value) {
@@ -166,4 +173,53 @@ ReturnValue lists_move(KeyValueStore *kvs, kv_key src_key, kv_key dest_key,
   element v = list_pop(src, wherefrom);
   lists_push(kvs, dest_key, v, whereto);
   return make_string(v);
+}
+
+static ListNode *find_list_node_at_index(List *l, int index) {
+  ListNode *current = l->head;
+  for (int i = 0; i < index; ++i) {
+    current = current->right;
+  }
+  return current;
+}
+
+// Deletes all nodes to the left of node in the list.
+// Node must be set as the list head after calling this function.
+static void delete_all_to_left(ListNode *node) {
+  if (node->left == NULL)
+    return;
+  delete_all_to_left(node->left);
+  delete_list_node(node->left);
+  node->left = NULL;
+}
+
+static void delete_all_to_right(ListNode *node) {
+  if (node->right == NULL)
+    return;
+  delete_all_to_right(node->right);
+  delete_list_node(node->right);
+  node->right = NULL;
+}
+
+ReturnValue lists_trim(KeyValueStore *kvs, kv_key list_name, int start,
+                       int end) {
+  Datastructure *d = kv_store_get_entry(kvs, list_name);
+  if (d == NULL)
+    return make_nil();
+  if (d->type != LIST)
+    return make_error(TYPE_ERROR_MSG);
+  List *list = d->data;
+  if (list->length <= start) {
+    kv_store_delete_entry(kvs, list_name);
+    return make_ok();
+  }
+  int end_index = min(list->length - 1, end);
+  ListNode *new_head = find_list_node_at_index(list, start);
+  ListNode *new_tail = find_list_node_at_index(list, end_index);
+  delete_all_to_left(new_head);
+  delete_all_to_right(new_tail);
+  list->head = new_head;
+  list->tail = new_tail;
+  list->length = end_index - start + 1;
+  return make_ok();
 }
