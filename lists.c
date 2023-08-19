@@ -201,6 +201,18 @@ static void delete_all_to_right(ListNode *node) {
   node->right = NULL;
 }
 
+static int negative_to_positive_index(int index, int list_length) {
+  if (index >= 0)
+    return index;
+  return max(list_length + index, 0);
+}
+
+static int trim_should_delete(int start_index, int end_index, int list_length) {
+  if (start_index >= list_length)
+    return 1;
+  return end_index < start_index;
+}
+
 ReturnValue lists_trim(KeyValueStore *kvs, kv_key list_name, int start,
                        int end) {
   Datastructure *d = kv_store_get_entry(kvs, list_name);
@@ -208,18 +220,23 @@ ReturnValue lists_trim(KeyValueStore *kvs, kv_key list_name, int start,
     return make_nil();
   if (d->type != LIST)
     return make_error(TYPE_ERROR_MSG);
+
   List *list = d->data;
-  if (list->length <= start) {
+  if (trim_should_delete(start, end, list->length)) {
     kv_store_delete_entry(kvs, list_name);
     return make_ok();
   }
-  int end_index = min(list->length - 1, end);
-  ListNode *new_head = find_list_node_at_index(list, start);
-  ListNode *new_tail = find_list_node_at_index(list, end_index);
+
+  int canonical_start = negative_to_positive_index(start, list->length);
+  int canonical_end =
+      min(negative_to_positive_index(end, list->length), list->length - 1);
+
+  ListNode *new_head = find_list_node_at_index(list, canonical_start);
+  ListNode *new_tail = find_list_node_at_index(list, canonical_end);
   delete_all_to_left(new_head);
   delete_all_to_right(new_tail);
   list->head = new_head;
   list->tail = new_tail;
-  list->length = end_index - start + 1;
+  list->length = canonical_end - canonical_start + 1;
   return make_ok();
 }

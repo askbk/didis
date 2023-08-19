@@ -149,7 +149,11 @@ static char *test_lists_trim() {
   lists_trim(kv, "list1", 1, 1);
   mu_assert("lists_trim should trim list to specified range (inclusive)",
             lists_length(kv, "list1").integer == 1);
-  lists_trim(kv, "list1", 0, 0);
+  lists_rpush(kv, "list1", "a");
+  lists_rpush(kv, "list1", "b");
+  lists_trim(kv, "list1", -99, -2);
+  mu_assert("lists_trim should support negative indeces",
+            lists_length(kv, "list1").integer == 2);
   return 0;
 }
 
