@@ -1,6 +1,6 @@
-# Didis
+# Reredis
 
-Didis (distant dictionary server) is a reimplementation of Redis for learning/fun.
+Reredis is a reimplementation of Redis for learning/fun.
 
 Progress:
 
