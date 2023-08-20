@@ -4,7 +4,14 @@
 #define TYPE_ERROR_MSG                                                         \
   "WRONGTYPE Operation against a key holding the wrong kind of value"
 
-enum return_type { ERR_RETURN, STR_RETURN, INT_RETURN, OK_RETURN, NIL_RETURN };
+enum return_type {
+  ERR_RETURN,
+  STR_RETURN,
+  INT_RETURN,
+  OK_RETURN,
+  NIL_RETURN,
+  ARRAY_RETURN
+};
 enum datastructure { STRING, LIST, NIL };
 
 typedef struct ReturnValue {
@@ -13,6 +20,7 @@ typedef struct ReturnValue {
   char *string;
   long integer;
   char *error_message;
+  char **array;
 } ReturnValue;
 
 ReturnValue make_string(char *string);
@@ -20,6 +28,8 @@ ReturnValue make_integer(long integer);
 ReturnValue make_nil();
 ReturnValue make_ok();
 ReturnValue make_error(char *error);
+ReturnValue make_array(char **array);
+
 int min(int a, int b);
 int max(int a, int b);
 

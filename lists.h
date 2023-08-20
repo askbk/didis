@@ -28,5 +28,7 @@ ReturnValue lists_move(KeyValueStore *kvs, kv_key source, kv_key destination,
                        list_end wherefrom, list_end whereto);
 ReturnValue lists_trim(KeyValueStore *kvs, kv_key list_name, int start,
                        int end);
+ReturnValue lists_range(KeyValueStore *kvs, kv_key list_name, int start,
+                        int end);
 
 #endif

@@ -240,3 +240,29 @@ ReturnValue lists_trim(KeyValueStore *kvs, kv_key list_name, int start,
   list->length = canonical_end - canonical_start + 1;
   return make_ok();
 }
+
+ReturnValue lists_range(KeyValueStore *kvs, kv_key list_name, int start,
+                        int end) {
+  Datastructure *d = kv_store_get_entry(kvs, list_name);
+  if (d == NULL)
+    return make_nil();
+  if (d->type != LIST)
+    return make_error(TYPE_ERROR_MSG);
+
+  List *list = d->data;
+  int canonical_start = negative_to_positive_index(start, list->length);
+  int canonical_end =
+      min(negative_to_positive_index(end, list->length), list->length - 1);
+
+  char **array = malloc(sizeof(*array) * list->length);
+
+  ListNode *curr = list->head;
+  for (int i = 0; i < canonical_end; ++i) {
+    if (i >= canonical_start) {
+      array[i] = curr->value;
+    }
+    curr = curr->right;
+  }
+
+  return make_array(array);
+}

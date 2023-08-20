@@ -25,5 +25,10 @@ ReturnValue make_error(char *error) {
   return r;
 }
 
+ReturnValue make_array(char **array) {
+  ReturnValue r = {.type = ARRAY_RETURN, .array = array};
+  return r;
+}
+
 int min(int a, int b) { return a < b ? a : b; }
 int max(int a, int b) { return a > b ? a : b; }
