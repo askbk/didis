@@ -4,6 +4,14 @@
 #define TYPE_ERROR_MSG                                                         \
   "WRONGTYPE Operation against a key holding the wrong kind of value"
 
+#define TYPECHECK_DATASTRUCTURE(datastructure, type_label)                     \
+  do {                                                                         \
+    if ((datastructure) == NULL)                                               \
+      return make_nil();                                                       \
+    if ((datastructure)->type != (type_label))                                 \
+      return make_error(TYPE_ERROR_MSG);                                       \
+  } while (0)
+
 enum return_type {
   ERR_RETURN,
   STR_RETURN,
@@ -12,7 +20,7 @@ enum return_type {
   NIL_RETURN,
   ARRAY_RETURN
 };
-enum datastructure { STRING, LIST, NIL };
+enum datastructure { STRING, LIST, NIL, SET };
 
 typedef struct ReturnValue {
   enum return_type type;

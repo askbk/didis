@@ -25,10 +25,7 @@ ReturnValue strings_set(KeyValueStore *kv, kv_key key, element value) {
 
 ReturnValue strings_get(KeyValueStore *kv, kv_key key) {
   Datastructure *d = kv_store_get_entry(kv, key);
-  if (d == NULL)
-    return make_nil();
-  if (d->type != STRING)
-    return make_error(TYPE_ERROR_MSG);
+  TYPECHECK_DATASTRUCTURE(d, STRING);
   return make_string(d->data);
 }
 
