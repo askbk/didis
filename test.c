@@ -2,6 +2,7 @@
 #include "keyvaluestore.h"
 #include "lists.h"
 #include "minunit.h"
+#include "sets.h"
 #include "strings.h"
 #include <stdio.h>
 #include <string.h>
@@ -157,6 +158,19 @@ static char *test_lists_trim() {
   return 0;
 }
 
+static char *test_sets_add() {
+  KeyValueStore *kv = new_kv_store();
+  mu_assert("empty keys should have cardinality 0",
+            sets_cardinality(kv, "f12").integer == 0);
+  ReturnValue r = sets_add(kv, "set", "hello");
+  mu_assert(
+      "sets_add should return the number of new elements added to the set",
+      r.integer == 1);
+  mu_assert("set cardinality should increase after adding member",
+            sets_cardinality(kv, "set").integer == 1);
+  return 0;
+}
+
 static char *all_tests() {
   mu_run_test(test_strings_set);
   mu_run_test(test_strings_get);
@@ -168,6 +182,8 @@ static char *all_tests() {
   mu_run_test(test_lists_rpush_rpop);
   mu_run_test(test_lists_move);
   mu_run_test(test_lists_trim);
+
+  mu_run_test(test_sets_add);
 
   mu_run_test(test_incorrect_type_handling);
   return 0;
