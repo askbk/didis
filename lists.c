@@ -144,7 +144,7 @@ ReturnValue lists_length(KeyValueStore *kv, kv_key list_name) {
 static ReturnValue lists_pop(KeyValueStore *kvs, kv_key list_name,
                              list_end wherefrom) {
   Datastructure *d = kv_store_get_entry(kvs, list_name);
-  TYPECHECK_DATASTRUCTURE(d, LIST);
+  TYPECHECK_DATASTRUCTURE_RETURN_NIL_IF_NULL(d, LIST);
 
   List *l = d->data;
   return make_string(list_pop(l, wherefrom));
@@ -161,7 +161,7 @@ ReturnValue lists_rpop(KeyValueStore *kvs, kv_key list_name) {
 ReturnValue lists_move(KeyValueStore *kvs, kv_key src_key, kv_key dest_key,
                        list_end wherefrom, list_end whereto) {
   Datastructure *d = kv_store_get_entry(kvs, src_key);
-  TYPECHECK_DATASTRUCTURE(d, LIST);
+  TYPECHECK_DATASTRUCTURE_RETURN_NIL_IF_NULL(d, LIST);
 
   List *src = d->data;
   if (is_empty_list(src))
@@ -212,7 +212,7 @@ static int trim_should_delete(int start_index, int end_index, int list_length) {
 ReturnValue lists_trim(KeyValueStore *kvs, kv_key list_name, int start,
                        int end) {
   Datastructure *d = kv_store_get_entry(kvs, list_name);
-  TYPECHECK_DATASTRUCTURE(d, LIST);
+  TYPECHECK_DATASTRUCTURE_RETURN_NIL_IF_NULL(d, LIST);
 
   List *list = d->data;
   if (trim_should_delete(start, end, list->length)) {
@@ -237,7 +237,7 @@ ReturnValue lists_trim(KeyValueStore *kvs, kv_key list_name, int start,
 ReturnValue lists_range(KeyValueStore *kvs, kv_key list_name, int start,
                         int end) {
   Datastructure *d = kv_store_get_entry(kvs, list_name);
-  TYPECHECK_DATASTRUCTURE(d, LIST);
+  TYPECHECK_DATASTRUCTURE_RETURN_NIL_IF_NULL(d, LIST);
 
   List *list = d->data;
   int canonical_start = negative_to_positive_index(start, list->length);
