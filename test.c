@@ -176,6 +176,14 @@ static char *test_sets_add() {
             sets_add(kv, "set", "hello").integer == 0);
   mu_assert("set size stays the same when the same element is added twice",
             sets_cardinality(kv, "set").integer == 1);
+  mu_assert("sets_remove should return 0 when called with non-existent key",
+            sets_remove(kv, "fdsafdsafff", "fdsafd").integer == 0);
+  mu_assert("sets_remove should return 0 when called with member which does "
+            "not belong to the set",
+            sets_remove(kv, "set", "fdsfdsfdsfds").integer == 0);
+  mu_assert(
+      "sets_remove should return the number of elements removed from the set",
+      sets_remove(kv, "set", "hello").integer == 1);
   return 0;
 }
 

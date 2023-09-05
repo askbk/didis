@@ -51,8 +51,22 @@ ReturnValue sets_add(KeyValueStore *kv, kv_key key, char *value) {
 ReturnValue sets_cardinality(KeyValueStore *kv, kv_key key) {
   Datastructure *d = kv_store_get_entry(kv, key);
   TYPECHECK_DATASTRUCTURE_RETURN_ZERO_IF_NULL(d, SET);
-  if (d == NULL)
-    return make_integer(0);
   struct Set *s = d->data;
   return make_integer(s->count);
+}
+
+ReturnValue sets_remove(KeyValueStore *kv, kv_key key, char *value) {
+  Datastructure *d = kv_store_get_entry(kv, key);
+  TYPECHECK_DATASTRUCTURE_RETURN_ZERO_IF_NULL(d, SET);
+  struct Set *s = d->data;
+
+  for (int i = 0; i < s->count; ++i) {
+    if (strcmp(s->elements[i], value) == 0) {
+      free(s->elements[i]);
+      s->elements[i] = NULL;
+      return make_integer(1);
+    }
+  }
+
+  return make_integer(0);
 }
