@@ -136,6 +136,8 @@ static char *test_incorrect_type_handling() {
   strings_set(kv, "string1", "hwllo");
   mu_assert("calling function on wrong datastructure should return error",
             lists_rpush(kv, "string1", "test").type == ERR_RETURN);
+  mu_assert("calling sets_add on wrong datastructure returns error",
+            sets_add(kv, "string1", "fdsfds").type == ERR_RETURN);
   return 0;
 }
 
@@ -162,11 +164,17 @@ static char *test_sets_add() {
   KeyValueStore *kv = new_kv_store();
   mu_assert("empty keys should have cardinality 0",
             sets_cardinality(kv, "f12").integer == 0);
+  mu_assert("sets_cardinality return type on empty sets should be integer",
+            sets_cardinality(kv, "rdsardsa").type == INT_RETURN);
   ReturnValue r = sets_add(kv, "set", "hello");
   mu_assert(
       "sets_add should return the number of new elements added to the set",
       r.integer == 1);
   mu_assert("set cardinality should increase after adding member",
+            sets_cardinality(kv, "set").integer == 1);
+  mu_assert("the same value is not added twice",
+            sets_add(kv, "set", "hello").integer == 0);
+  mu_assert("set size stays the same when the same element is added twice",
             sets_cardinality(kv, "set").integer == 1);
   return 0;
 }

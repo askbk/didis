@@ -12,6 +12,15 @@
       return make_error(TYPE_ERROR_MSG);                                       \
   } while (0)
 
+#define TYPECHECK_DATASTRUCTURE_RETURN_ZERO_IF_NULL(datastructure, type_label) \
+  do {                                                                         \
+    if ((datastructure) == NULL) {                                             \
+      return make_integer(0);                                                  \
+    }                                                                          \
+    if ((datastructure)->type != (type_label))                                 \
+      return make_error(TYPE_ERROR_MSG);                                       \
+  } while (0)
+
 enum return_type {
   ERR_RETURN,
   STR_RETURN,

@@ -28,6 +28,7 @@ ReturnValue sets_add(KeyValueStore *kv, kv_key key, char *value) {
     kv_store_set_entry(kv, key, d);
   }
 
+  TYPECHECK_DATASTRUCTURE(d, SET);
   struct Set *s = d->data;
 
   for (int i = 0; i < s->count; ++i) {
@@ -49,6 +50,7 @@ ReturnValue sets_add(KeyValueStore *kv, kv_key key, char *value) {
 
 ReturnValue sets_cardinality(KeyValueStore *kv, kv_key key) {
   Datastructure *d = kv_store_get_entry(kv, key);
+  TYPECHECK_DATASTRUCTURE_RETURN_ZERO_IF_NULL(d, SET);
   if (d == NULL)
     return make_integer(0);
   struct Set *s = d->data;
