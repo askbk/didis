@@ -56,4 +56,6 @@ ReturnValue make_array(char **array);
 int min(int a, int b);
 int max(int a, int b);
 
+int values_are_equal(char *a, char *b);
+
 #endif

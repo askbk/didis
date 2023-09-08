@@ -1,4 +1,5 @@
 #include "common.h"
+#include <string.h>
 
 ReturnValue make_string(char *string) {
   ReturnValue r = {.type = STR_RETURN, .string = string};
@@ -32,3 +33,5 @@ ReturnValue make_array(char **array) {
 
 int min(int a, int b) { return a < b ? a : b; }
 int max(int a, int b) { return a > b ? a : b; }
+
+int values_are_equal(char *a, char *b) { return strcmp(a, b) == 0; }

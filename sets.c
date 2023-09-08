@@ -32,7 +32,7 @@ ReturnValue sets_add(KeyValueStore *kv, kv_key key, char *value) {
   struct Set *s = d->data;
 
   for (int i = 0; i < s->count; ++i) {
-    if (strcmp(s->elements[i], value) == 0) {
+    if (values_are_equal(s->elements[i], value)) {
       return make_integer(0);
     }
   }
@@ -61,7 +61,7 @@ ReturnValue sets_remove(KeyValueStore *kv, kv_key key, char *value) {
   struct Set *s = d->data;
 
   for (int i = 0; i < s->count; ++i) {
-    if (strcmp(s->elements[i], value) == 0) {
+    if (values_are_equal(s->elements[i], value)) {
       free(s->elements[i]);
       s->elements[i] = NULL;
       return make_integer(1);
@@ -77,7 +77,7 @@ ReturnValue sets_ismember(KeyValueStore *kv, kv_key key, char *value) {
   struct Set *s = d->data;
 
   for (int i = 0; i < s->count; ++i) {
-    if (strcmp(s->elements[i], value) == 0) {
+    if (values_are_equal(s->elements[i], value)) {
       return make_integer(1);
     }
   }

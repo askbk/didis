@@ -1,8 +1,8 @@
 #include "keyvaluestore.h"
+#include "common.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <strings.h>
 #include <sys/types.h>
 
 KeyValueStore *new_kv_store(void) {
@@ -41,11 +41,9 @@ void print_kv_contents(KeyValueStore *kv) {
   }
 }
 
-static int kv_key_compare(kv_key k1, kv_key k2) { return strcmp(k1, k2) == 0; }
-
 static int kv_store_find_key_index(KeyValueStore *kv, kv_key key) {
   for (int i = 0; i < kv->size; ++i) {
-    if (kv_key_compare(key, kv->keys[i]))
+    if (values_are_equal(key, kv->keys[i]))
       return i;
   }
 
