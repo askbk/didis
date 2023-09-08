@@ -11,5 +11,6 @@ struct Set {
 ReturnValue sets_add(KeyValueStore *kv, kv_key key, char *value);
 ReturnValue sets_cardinality(KeyValueStore *kv, kv_key key);
 ReturnValue sets_remove(KeyValueStore *kv, kv_key key, char *value);
+ReturnValue sets_ismember(KeyValueStore *kv, kv_key key, char *value);
 
 #endif

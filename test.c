@@ -160,7 +160,7 @@ static char *test_lists_trim() {
   return 0;
 }
 
-static char *test_sets_add() {
+static char *test_sets_basic_commands() {
   KeyValueStore *kv = new_kv_store();
   mu_assert("empty keys should have cardinality 0",
             sets_cardinality(kv, "f12").integer == 0);
@@ -184,6 +184,14 @@ static char *test_sets_add() {
   mu_assert(
       "sets_remove should return the number of elements removed from the set",
       sets_remove(kv, "set", "hello").integer == 1);
+  mu_assert("sets_ismember should return 0 if the set does not exist",
+            sets_ismember(kv, "wwww", "test").integer == 0);
+  sets_add(kv, "set2", "value");
+  mu_assert(
+      "sets_ismember should return 0 if the value is not a member of the set",
+      sets_ismember(kv, "set2", "blahblah").integer == 0);
+  mu_assert("sets_ismember should return 1 if the value is a member of the set",
+            sets_ismember(kv, "set2", "value").integer == 1);
   return 0;
 }
 
@@ -199,7 +207,7 @@ static char *all_tests() {
   mu_run_test(test_lists_move);
   mu_run_test(test_lists_trim);
 
-  mu_run_test(test_sets_add);
+  mu_run_test(test_sets_basic_commands);
 
   mu_run_test(test_incorrect_type_handling);
   return 0;

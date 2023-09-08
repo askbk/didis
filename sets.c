@@ -70,3 +70,17 @@ ReturnValue sets_remove(KeyValueStore *kv, kv_key key, char *value) {
 
   return make_integer(0);
 }
+
+ReturnValue sets_ismember(KeyValueStore *kv, kv_key key, char *value) {
+  Datastructure *d = kv_store_get_entry(kv, key);
+  TYPECHECK_DATASTRUCTURE_RETURN_ZERO_IF_NULL(d, SET);
+  struct Set *s = d->data;
+
+  for (int i = 0; i < s->count; ++i) {
+    if (strcmp(s->elements[i], value) == 0) {
+      return make_integer(1);
+    }
+  }
+
+  return make_integer(0);
+}
