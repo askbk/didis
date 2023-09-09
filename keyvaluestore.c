@@ -73,9 +73,9 @@ void kv_store_set_entry(KeyValueStore *kv, kv_key key, Datastructure *value) {
   }
 
   ++(kv->size);
-  kv->keys = realloc(kv->keys, sizeof(kv_key) * kv->size);
+  kv->keys = reallocarray(kv->keys, sizeof(kv_key), kv->size);
   kv->datastructures =
-      realloc(kv->datastructures, sizeof(Datastructure *) * kv->size);
+      reallocarray(kv->datastructures, sizeof(Datastructure *), kv->size);
 
   int index = kv->size - 1;
 
@@ -105,9 +105,9 @@ ReturnValue kv_store_delete_entry(KeyValueStore *kv, kv_key key) {
 
   --(kv->size);
 
-  kv->keys = realloc(kv->keys, kv->size * sizeof(kv_key));
+  kv->keys = reallocarray(kv->keys, sizeof(kv_key), kv->size);
   kv->datastructures =
-      realloc(kv->datastructures, kv->size * sizeof(Datastructure));
+      reallocarray(kv->datastructures, sizeof(Datastructure), kv->size);
 
   return make_integer(1);
 }
