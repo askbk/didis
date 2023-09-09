@@ -186,12 +186,22 @@ static char *test_sets_basic_commands() {
       sets_remove(kv, "set", "hello").integer == 1);
   mu_assert("sets_ismember should return 0 if the set does not exist",
             sets_ismember(kv, "wwww", "test").integer == 0);
-  sets_add(kv, "set2", "value");
+  sets_add(kv, "set2", "value1");
+  sets_add(kv, "set2", "value2");
+  sets_add(kv, "set2", "value3");
+  int card_before_remove = sets_cardinality(kv, "set2").integer;
   mu_assert(
       "sets_ismember should return 0 if the value is not a member of the set",
       sets_ismember(kv, "set2", "blahblah").integer == 0);
   mu_assert("sets_ismember should return 1 if the value is a member of the set",
-            sets_ismember(kv, "set2", "value").integer == 1);
+            sets_ismember(kv, "set2", "value1").integer == 1);
+  sets_remove(kv, "set2", "value1");
+  mu_assert("Removing an element should decrease the cardinality of the set",
+            sets_cardinality(kv, "set2").integer == card_before_remove - 1);
+  mu_assert("sets_ismember should_return 0 for values that have been removed "
+            "from the set",
+            sets_ismember(kv, "set2", "value1").integer == 0);
+
   return 0;
 }
 

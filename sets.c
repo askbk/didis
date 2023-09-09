@@ -63,7 +63,12 @@ ReturnValue sets_remove(KeyValueStore *kv, kv_key key, char *value) {
   for (int i = 0; i < s->count; ++i) {
     if (values_are_equal(s->elements[i], value)) {
       free(s->elements[i]);
-      s->elements[i] = NULL;
+      if (i < s->count - 1) {
+        memmove(&s->elements[i], &s->elements[i + 1],
+                sizeof(char *) * (s->count - i - 1));
+      }
+      s->count--;
+      s->elements = reallocarray(s->elements, sizeof(char *), s->count);
       return make_integer(1);
     }
   }
