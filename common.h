@@ -44,6 +44,7 @@ typedef struct ReturnValue {
   long integer;
   char *error_message;
   char **array;
+  int array_length;
 } ReturnValue;
 
 ReturnValue make_string(char *string);
@@ -51,7 +52,7 @@ ReturnValue make_integer(long integer);
 ReturnValue make_nil();
 ReturnValue make_ok();
 ReturnValue make_error(char *error);
-ReturnValue make_array(char **array);
+ReturnValue make_array(char **array, int array_length);
 
 int min(int a, int b);
 int max(int a, int b);

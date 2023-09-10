@@ -244,15 +244,15 @@ ReturnValue lists_range(KeyValueStore *kvs, kv_key list_name, int start,
   int canonical_end =
       min(negative_to_positive_index(end, list->length), list->length - 1);
 
-  char **array = malloc(sizeof(*array) * list->length);
+  int return_length = canonical_end - canonical_start + 1;
+  char **array = malloc(sizeof(*array) * return_length);
 
-  ListNode *curr = list->head;
-  for (int i = 0; i < canonical_end; ++i) {
-    if (i >= canonical_start) {
-      array[i] = curr->value;
-    }
+  ListNode *curr = find_list_node_at_index(list, canonical_start);
+  for (int i = 0; i < return_length; ++i) {
+    array[i] = malloc(sizeof(array[i]) * strlen(curr->value) + 1);
+    strcpy(array[i], curr->value);
     curr = curr->right;
   }
 
-  return make_array(array);
+  return make_array(array, return_length);
 }

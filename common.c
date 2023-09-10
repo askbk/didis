@@ -26,8 +26,9 @@ ReturnValue make_error(char *error) {
   return r;
 }
 
-ReturnValue make_array(char **array) {
-  ReturnValue r = {.type = ARRAY_RETURN, .array = array};
+ReturnValue make_array(char **array, int array_length) {
+  ReturnValue r = {
+      .type = ARRAY_RETURN, .array = array, .array_length = array_length};
   return r;
 }
 

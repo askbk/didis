@@ -102,6 +102,14 @@ static char *test_lists_rpush_rpop() {
 
   lists_rpush(kv, "mylist", "a");
   lists_rpush(kv, "mylist", "b");
+  ReturnValue mylist = lists_range(kv, "mylist", 0, 99);
+  mu_assert("list should have length 3", mylist.array_length == 3);
+  mu_assert("first list element should be the first rpushed",
+            strcmp(mylist.array[0], "hello world") == 0);
+  mu_assert("second list element should be the second rpushed",
+            strcmp(mylist.array[1], "a") == 0);
+  mu_assert("this list element should be the third rpushed",
+            strcmp(mylist.array[2], "b") == 0);
 
   mu_assert("lists_rpop should return tail of list",
             strcmp(lists_rpop(kv, "mylist").string, "b") == 0);
@@ -146,17 +154,31 @@ static char *test_lists_trim() {
   lists_rpush(kv, "list1", "a");
   lists_rpush(kv, "list1", "b");
   lists_rpush(kv, "list1", "c");
+  // list1: a,b,c
   lists_trim(kv, "list1", 0, 99);
   mu_assert("lists_trim should not modify list when range includes whole list",
             lists_length(kv, "list1").integer == 3);
   lists_trim(kv, "list1", 1, 1);
   mu_assert("lists_trim should trim list to specified range (inclusive)",
             lists_length(kv, "list1").integer == 1);
+  // list1: b
   lists_rpush(kv, "list1", "a");
   lists_rpush(kv, "list1", "b");
+  // list1: b,a,b
+  ReturnValue beforetrimmed = lists_range(kv, "list1", 0, 99);
+  mu_assert("lists_range should return the list items in correct order",
+            strcmp(beforetrimmed.array[0], "b") == 0 &&
+                strcmp(beforetrimmed.array[1], "a") == 0 &&
+                strcmp(beforetrimmed.array[2], "b") == 0);
   lists_trim(kv, "list1", -99, -2);
   mu_assert("lists_trim should support negative indeces",
             lists_length(kv, "list1").integer == 2);
+  ReturnValue trimmed = lists_range(kv, "list1", 0, 99);
+  mu_assert("lists_range returns the correct number of items",
+            trimmed.array_length == 2);
+  mu_assert("lists_range returns the correct items",
+            strcmp(trimmed.array[0], "b") == 0 &&
+                strcmp(trimmed.array[1], "a") == 0);
   return 0;
 }
 
@@ -205,6 +227,15 @@ static char *test_sets_basic_commands() {
   return 0;
 }
 
+static char *test_sets_complex_commands() {
+  // KeyValueStore *kv = new_kv_store();
+  // test with two empty sets -> empty
+  // mu_assert("intersection of two empty sets returns no elements",
+  // sets_intersection(kv, "set1", "set2"). test with one empty set -> empty
+  // test intersection of 1,2,3, and 4,5,6 -> should be empty
+  return 0;
+}
+
 static char *all_tests() {
   mu_run_test(test_strings_set);
   mu_run_test(test_strings_get);
@@ -218,6 +249,7 @@ static char *all_tests() {
   mu_run_test(test_lists_trim);
 
   mu_run_test(test_sets_basic_commands);
+  mu_run_test(test_sets_complex_commands);
 
   mu_run_test(test_incorrect_type_handling);
   return 0;
