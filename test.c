@@ -252,6 +252,8 @@ static char *test_sets_complex_commands() {
   ReturnValue inter1 = sets_intersection(kv, "set1", "set2");
   mu_assert("intersection of two sets should return all elements in common",
             inter1.array_length == 1);
+  mu_assert("intersection contains correct elements",
+            strcmp(inter1.array[0], "d") == 0);
   return 0;
 }
 
