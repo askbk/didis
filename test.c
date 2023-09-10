@@ -228,10 +228,17 @@ static char *test_sets_basic_commands() {
 }
 
 static char *test_sets_complex_commands() {
-  // KeyValueStore *kv = new_kv_store();
+  KeyValueStore *kv = new_kv_store();
   // test with two empty sets -> empty
-  // mu_assert("intersection of two empty sets returns no elements",
+  mu_assert("intersection of two empty sets returns no elements",
+            sets_intersection(kv, "bla1", "bla5").array_length == 0);
   // sets_intersection(kv, "set1", "set2"). test with one empty set -> empty
+  sets_add(kv, "set1", "a");
+  sets_add(kv, "set1", "b");
+  mu_assert("intersection of a non-empty and an empty set is empty",
+            sets_intersection(kv, "set1", "blabal").array_length == 0);
+  mu_assert("intersection of a non-empty and an empty set is empty",
+            sets_intersection(kv, "blablab", "set1").array_length == 0);
   // test intersection of 1,2,3, and 4,5,6 -> should be empty
   return 0;
 }

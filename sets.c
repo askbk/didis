@@ -89,3 +89,7 @@ ReturnValue sets_ismember(KeyValueStore *kv, kv_key key, char *value) {
 
   return make_integer(0);
 }
+
+ReturnValue sets_intersection(KeyValueStore *kv, kv_key key1, kv_key key2) {
+  return make_array(NULL, 0);
+}
