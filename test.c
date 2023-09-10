@@ -235,11 +235,23 @@ static char *test_sets_complex_commands() {
   // sets_intersection(kv, "set1", "set2"). test with one empty set -> empty
   sets_add(kv, "set1", "a");
   sets_add(kv, "set1", "b");
+  sets_add(kv, "set1", "c");
   mu_assert("intersection of a non-empty and an empty set is empty",
             sets_intersection(kv, "set1", "blabal").array_length == 0);
   mu_assert("intersection of a non-empty and an empty set is empty",
             sets_intersection(kv, "blablab", "set1").array_length == 0);
-  // test intersection of 1,2,3, and 4,5,6 -> should be empty
+  // test intersection of a,b,c, and d,e,f -> should be empty
+  sets_add(kv, "set2", "d");
+  sets_add(kv, "set2", "e");
+  sets_add(kv, "set2", "f");
+  mu_assert(
+      "intersection of two sets without elements in common should be empty",
+      sets_intersection(kv, "set1", "set2").array_length == 0);
+
+  sets_add(kv, "set1", "d");
+  ReturnValue inter1 = sets_intersection(kv, "set1", "set2");
+  mu_assert("intersection of two sets should return all elements in common",
+            inter1.array_length == 1);
   return 0;
 }
 

@@ -26,6 +26,14 @@
     }                                                                          \
     TYPECHECK_DATASTRUCTURE((datastructure), (type_label));                    \
   } while (0)
+#define TYPECHECK_DATASTRUCTURE_RETURN_EMPTY_ARRAY_IF_NULL(datastructure,      \
+                                                           type_label)         \
+  do {                                                                         \
+    if ((datastructure) == NULL) {                                             \
+      return make_array(NULL, 0);                                              \
+    }                                                                          \
+    TYPECHECK_DATASTRUCTURE((datastructure), (type_label));                    \
+  } while (0)
 
 enum return_type {
   ERR_RETURN,
