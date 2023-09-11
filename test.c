@@ -227,7 +227,7 @@ static char *test_sets_basic_commands() {
   return 0;
 }
 
-static char *test_sets_complex_commands() {
+static char *test_sets_intersection() {
   KeyValueStore *kv = new_kv_store();
   // test with two empty sets -> empty
   mu_assert("intersection of two empty sets returns no elements",
@@ -257,6 +257,33 @@ static char *test_sets_complex_commands() {
   return 0;
 }
 
+static char *test_sets_difference() {
+  KeyValueStore *kv = new_kv_store();
+  mu_assert("difference between empty sets is empty",
+            sets_difference(kv, "fdsafdsa", "foooofa").array_length == 0);
+  sets_add(kv, "set1", "a");
+  mu_assert("difference between empty sets and non-empty sets is empty",
+            sets_difference(kv, "ffffffsaf", "set1").array_length == 0);
+  ReturnValue diff1 = sets_difference(kv, "set1", "fdsafpd");
+  mu_assert("difference between non-empty set and empty set is the entire "
+            "non-empty set",
+            diff1.array_length == 1);
+  mu_assert("difference between non-empty set and empty set is the entire "
+            "non-empty set",
+            strcmp(diff1.array[0], "a") == 0);
+
+  sets_add(kv, "set1", "b");
+  sets_add(kv, "set1", "c");
+  sets_add(kv, "set1", "f");
+  sets_add(kv, "set2", "b");
+  sets_add(kv, "set2", "c");
+  sets_add(kv, "set2", "d");
+  ReturnValue diff2 = sets_difference(kv, "set1", "set2");
+  mu_assert("set difference has correct number of elements",
+            diff2.array_length == 2);
+  return 0;
+}
+
 static char *all_tests() {
   mu_run_test(test_strings_set);
   mu_run_test(test_strings_get);
@@ -270,7 +297,8 @@ static char *all_tests() {
   mu_run_test(test_lists_trim);
 
   mu_run_test(test_sets_basic_commands);
-  mu_run_test(test_sets_complex_commands);
+  mu_run_test(test_sets_intersection);
+  mu_run_test(test_sets_difference);
 
   mu_run_test(test_incorrect_type_handling);
   return 0;

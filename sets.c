@@ -118,3 +118,31 @@ ReturnValue sets_intersection(KeyValueStore *kv, kv_key key1, kv_key key2) {
 
   return make_array(result, result_size);
 }
+
+ReturnValue sets_difference(KeyValueStore *kv, kv_key key1, kv_key key2) {
+  Datastructure *d1 = kv_store_get_entry(kv, key1);
+  TYPECHECK_DATASTRUCTURE_RETURN_EMPTY_ARRAY_IF_NULL(d1, SET);
+  Datastructure *d2 = kv_store_get_entry(kv, key2);
+  TYPECHECK_DATASTRUCTURE(d2, SET);
+
+  struct Set *s1 = d1->data;
+  if (d2 == NULL) {
+    d2 = make_set_datastructure();
+  }
+  struct Set *s2 = d2->data;
+
+  char **result = malloc(sizeof(*result) * s1->count);
+  int result_size = 0;
+  for (int i = 0; i < s1->count; ++i) {
+    if (!ismember(s2, s1->elements[i])) {
+      result[result_size] =
+          malloc(sizeof(result[result_size]) * strlen(s1->elements[i]));
+      strcpy(result[result_size], s1->elements[i]);
+      ++result_size;
+    }
+  }
+
+  result = reallocarray(result, sizeof(result[0]), result_size);
+
+  return make_array(result, result_size);
+}
