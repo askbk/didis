@@ -71,6 +71,7 @@ static char *test_strings_increment() {
   strings_set(kv, "string", "hello world");
   mu_assert("kv_store increment should return error if value is not an integer",
             strings_increment(kv, "string").type == ERR_RETURN);
+  delete_kv_store(kv);
   return 0;
 }
 
@@ -133,9 +134,17 @@ static char *test_lists_move() {
                 0);
   mu_assert("lists_move should remove the element from the source list",
             lists_length(kv, "list1").integer == 0);
+  ReturnValue dest_list = lists_range(kv, "list2", 0, 10);
   mu_assert("lists_move should add the element to the destination list at the "
             "specified end",
-            strcmp(lists_lpop(kv, "list2").string, "a") == 0);
+            dest_list.array_length == 3);
+  mu_assert("lists_move should add the element to the destination list at the "
+            "specified end",
+            strcmp(dest_list.array[0], "a") == 0 &&
+                strcmp(dest_list.array[1], "b") == 0 &&
+                strcmp(dest_list.array[2], "c") == 0);
+
+  // delete_kv_store(kv);
   return 0;
 }
 
@@ -146,6 +155,7 @@ static char *test_incorrect_type_handling() {
             lists_rpush(kv, "string1", "test").type == ERR_RETURN);
   mu_assert("calling sets_add on wrong datastructure returns error",
             sets_add(kv, "string1", "fdsfds").type == ERR_RETURN);
+  delete_kv_store(kv);
   return 0;
 }
 
@@ -179,6 +189,7 @@ static char *test_lists_trim() {
   mu_assert("lists_range returns the correct items",
             strcmp(trimmed.array[0], "b") == 0 &&
                 strcmp(trimmed.array[1], "a") == 0);
+  delete_kv_store(kv);
   return 0;
 }
 
@@ -224,6 +235,7 @@ static char *test_sets_basic_commands() {
             "from the set",
             sets_ismember(kv, "set2", "value1").integer == 0);
 
+  delete_kv_store(kv);
   return 0;
 }
 
@@ -254,6 +266,7 @@ static char *test_sets_intersection() {
             inter1.array_length == 1);
   mu_assert("intersection contains correct elements",
             strcmp(inter1.array[0], "d") == 0);
+  delete_kv_store(kv);
   return 0;
 }
 
@@ -281,6 +294,7 @@ static char *test_sets_difference() {
   ReturnValue diff2 = sets_difference(kv, "set1", "set2");
   mu_assert("set difference has correct number of elements",
             diff2.array_length == 2);
+  delete_kv_store(kv);
   return 0;
 }
 
