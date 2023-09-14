@@ -9,6 +9,14 @@
 
 int tests_run = 0;
 
+static int arr_contains_str(char **arr, int arr_length, char *str) {
+  for (int i = 0; i < arr_length; ++i) {
+    if (strcmp(arr[i], str) == 0)
+      return 1;
+  }
+  return 0;
+}
+
 static char *test_strings_set() {
   KeyValueStore *kv = new_kv_store();
   mu_assert("error, nonempty kv store", kv->size == 0);
@@ -265,7 +273,8 @@ static char *test_sets_intersection() {
   mu_assert("intersection of two sets should return all elements in common",
             inter1.array_length == 1);
   mu_assert("intersection contains correct elements",
-            strcmp(inter1.array[0], "d") == 0);
+            arr_contains_str(inter1.array, inter1.array_length, "d"));
+
   delete_kv_store(kv);
   return 0;
 }
@@ -283,7 +292,7 @@ static char *test_sets_difference() {
             diff1.array_length == 1);
   mu_assert("difference between non-empty set and empty set is the entire "
             "non-empty set",
-            strcmp(diff1.array[0], "a") == 0);
+            arr_contains_str(diff1.array, diff1.array_length, "a"));
 
   sets_add(kv, "set1", "b");
   sets_add(kv, "set1", "c");
@@ -294,6 +303,9 @@ static char *test_sets_difference() {
   ReturnValue diff2 = sets_difference(kv, "set1", "set2");
   mu_assert("set difference has correct number of elements",
             diff2.array_length == 2);
+  mu_assert("set difference contains correct elements",
+            arr_contains_str(diff2.array, diff2.array_length, "a") &&
+                arr_contains_str(diff2.array, diff2.array_length, "f"));
   delete_kv_store(kv);
   return 0;
 }
@@ -306,9 +318,11 @@ static char *test_sets_union() {
   sets_add(kv, "set1", "b");
   mu_assert("union of a set with an empty set is the entire first set",
             sets_union(kv, "set1", "fdsfsd").array_length == 2);
-  mu_assert("union of a set with an empty set is the entire first set "
-            "independent of argument order",
-            sets_union(kv, "fdsfsd", "set1").array_length == 2);
+  mu_assert(
+      "union of an empty set with a non-empty set is the entire second set "
+      "independent of argument order",
+      sets_union(kv, "fdsfsd", "set1").array_length == 2);
+  delete_kv_store(kv);
   return 0;
 }
 
