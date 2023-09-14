@@ -298,6 +298,20 @@ static char *test_sets_difference() {
   return 0;
 }
 
+static char *test_sets_union() {
+  KeyValueStore *kv = new_kv_store();
+  mu_assert("union of empty sets is empty",
+            sets_union(kv, "fds8fd", "fds089").array_length == 0);
+  sets_add(kv, "set1", "a");
+  sets_add(kv, "set1", "b");
+  mu_assert("union of a set with an empty set is the entire first set",
+            sets_union(kv, "set1", "fdsfsd").array_length == 2);
+  mu_assert("union of a set with an empty set is the entire first set "
+            "independent of argument order",
+            sets_union(kv, "fdsfsd", "set1").array_length == 2);
+  return 0;
+}
+
 static char *all_tests() {
   mu_run_test(test_strings_set);
   mu_run_test(test_strings_get);
@@ -313,6 +327,7 @@ static char *all_tests() {
   mu_run_test(test_sets_basic_commands);
   mu_run_test(test_sets_intersection);
   mu_run_test(test_sets_difference);
+  mu_run_test(test_sets_union);
 
   mu_run_test(test_incorrect_type_handling);
   return 0;
