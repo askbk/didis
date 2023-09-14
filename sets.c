@@ -69,6 +69,9 @@ ReturnValue sets_remove(KeyValueStore *kv, kv_key key, char *value) {
       }
       s->count--;
       s->elements = reallocarray(s->elements, sizeof(char *), s->count);
+      if (s->count == 0) {
+        kv_store_delete_entry(kv, key);
+      }
       return make_integer(1);
     }
   }
