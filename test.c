@@ -144,7 +144,7 @@ static char *test_lists_move() {
                 strcmp(dest_list.array[1], "b") == 0 &&
                 strcmp(dest_list.array[2], "c") == 0);
 
-  // delete_kv_store(kv);
+  delete_kv_store(kv);
   return 0;
 }
 

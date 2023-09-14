@@ -13,6 +13,10 @@ static void delete_list_node(ListNode *node) {
 // Frees the list and all its list nodes.
 static void delete_list(List *list) {
   ListNode *n = list->head;
+  if (n == NULL) {
+    free(list);
+    return;
+  }
   while ((n = n->right) != NULL) {
     delete_list_node(n->left);
   }
@@ -81,6 +85,9 @@ static element list_pop(List *list, list_end wherefrom) {
       end->left->right = NULL;
       list->tail = list->tail->left;
     }
+  } else {
+    list->head = NULL;
+    list->tail = NULL;
   }
   delete_list_node(end);
   --(list->length);
@@ -147,7 +154,11 @@ static ReturnValue lists_pop(KeyValueStore *kvs, kv_key list_name,
   TYPECHECK_DATASTRUCTURE_RETURN_NIL_IF_NULL(d, LIST);
 
   List *l = d->data;
-  return make_string(list_pop(l, wherefrom));
+  ReturnValue result = make_string(list_pop(l, wherefrom));
+  if (is_empty_list(l)) {
+    kv_store_delete_entry(kvs, list_name);
+  }
+  return result;
 }
 
 ReturnValue lists_lpop(KeyValueStore *kvs, kv_key list_name) {
@@ -164,9 +175,10 @@ ReturnValue lists_move(KeyValueStore *kvs, kv_key src_key, kv_key dest_key,
   TYPECHECK_DATASTRUCTURE_RETURN_NIL_IF_NULL(d, LIST);
 
   List *src = d->data;
-  if (is_empty_list(src))
-    return make_nil();
   element v = list_pop(src, wherefrom);
+  if (is_empty_list(src)) {
+    kv_store_delete_entry(kvs, src_key);
+  }
   lists_push(kvs, dest_key, v, whereto);
   return make_string(v);
 }
