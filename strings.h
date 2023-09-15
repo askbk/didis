@@ -4,8 +4,9 @@
 #ifndef STRINGS_H
 #define STRINGS_H
 
-ReturnValue strings_set(KeyValueStore *kvs, kv_key key, char *value);
-ReturnValue strings_get(KeyValueStore *kvs, kv_key key);
-ReturnValue strings_increment(KeyValueStore *kvs, kv_key key);
+struct ReturnValue strings_set(struct KeyValueStore *kvs, kv_key key,
+                               char *value);
+struct ReturnValue strings_get(struct KeyValueStore *kvs, kv_key key);
+struct ReturnValue strings_increment(struct KeyValueStore *kvs, kv_key key);
 
 #endif

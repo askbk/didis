@@ -5,12 +5,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-static void strings_free(Datastructure *string_datastructure) {
+static void strings_free(struct Datastructure *string_datastructure) {
   free(string_datastructure->data);
 }
 
-static Datastructure *make_string_datastructure(element string) {
-  Datastructure *v = malloc(sizeof(*v));
+static struct Datastructure *make_string_datastructure(element string) {
+  struct Datastructure *v = malloc(sizeof(*v));
   v->data = malloc(strlen(string) + 1);
   strcpy(v->data, string);
   v->type = STRING;
@@ -18,19 +18,20 @@ static Datastructure *make_string_datastructure(element string) {
   return v;
 }
 
-ReturnValue strings_set(KeyValueStore *kv, kv_key key, element value) {
+struct ReturnValue strings_set(struct KeyValueStore *kv, kv_key key,
+                               element value) {
   kv_store_set_entry(kv, key, make_string_datastructure(value));
   return make_ok();
 }
 
-ReturnValue strings_get(KeyValueStore *kv, kv_key key) {
-  Datastructure *d = kv_store_get_entry(kv, key);
+struct ReturnValue strings_get(struct KeyValueStore *kv, kv_key key) {
+  struct Datastructure *d = kv_store_get_entry(kv, key);
   TYPECHECK_DATASTRUCTURE_RETURN_NIL_IF_NULL(d, STRING);
   return make_string(d->data);
 }
 
-ReturnValue strings_increment(KeyValueStore *kv, kv_key key) {
-  Datastructure *d = kv_store_get_entry(kv, key);
+struct ReturnValue strings_increment(struct KeyValueStore *kv, kv_key key) {
+  struct Datastructure *d = kv_store_get_entry(kv, key);
   if (d == NULL) {
     strings_set(kv, key, "1");
     return make_integer(1);

@@ -4,14 +4,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-static void sets_free(Datastructure *set_datastructure) {
+static void sets_free(struct Datastructure *set_datastructure) {
   struct Set *s = set_datastructure->data;
   free(s->elements);
   free(s);
 }
 
-static Datastructure *make_set_datastructure() {
-  Datastructure *d = malloc(sizeof(*d));
+static struct Datastructure *make_set_datastructure() {
+  struct Datastructure *d = malloc(sizeof(*d));
   struct Set *s = malloc(sizeof(*s));
   s->count = 0;
   s->elements = NULL;
@@ -21,8 +21,8 @@ static Datastructure *make_set_datastructure() {
   return d;
 }
 
-ReturnValue sets_add(KeyValueStore *kv, kv_key key, char *value) {
-  Datastructure *d = kv_store_get_entry(kv, key);
+struct ReturnValue sets_add(struct KeyValueStore *kv, kv_key key, char *value) {
+  struct Datastructure *d = kv_store_get_entry(kv, key);
   if (d == NULL) {
     d = make_set_datastructure();
     kv_store_set_entry(kv, key, d);
@@ -48,15 +48,16 @@ ReturnValue sets_add(KeyValueStore *kv, kv_key key, char *value) {
   return make_integer(1);
 }
 
-ReturnValue sets_cardinality(KeyValueStore *kv, kv_key key) {
-  Datastructure *d = kv_store_get_entry(kv, key);
+struct ReturnValue sets_cardinality(struct KeyValueStore *kv, kv_key key) {
+  struct Datastructure *d = kv_store_get_entry(kv, key);
   TYPECHECK_DATASTRUCTURE_RETURN_ZERO_IF_NULL(d, SET);
   struct Set *s = d->data;
   return make_integer(s->count);
 }
 
-ReturnValue sets_remove(KeyValueStore *kv, kv_key key, char *value) {
-  Datastructure *d = kv_store_get_entry(kv, key);
+struct ReturnValue sets_remove(struct KeyValueStore *kv, kv_key key,
+                               char *value) {
+  struct Datastructure *d = kv_store_get_entry(kv, key);
   TYPECHECK_DATASTRUCTURE_RETURN_ZERO_IF_NULL(d, SET);
   struct Set *s = d->data;
 
@@ -88,17 +89,19 @@ static int ismember(struct Set *set, char *value) {
   return 0;
 }
 
-ReturnValue sets_ismember(KeyValueStore *kv, kv_key key, char *value) {
-  Datastructure *d = kv_store_get_entry(kv, key);
+struct ReturnValue sets_ismember(struct KeyValueStore *kv, kv_key key,
+                                 char *value) {
+  struct Datastructure *d = kv_store_get_entry(kv, key);
   TYPECHECK_DATASTRUCTURE_RETURN_ZERO_IF_NULL(d, SET);
   struct Set *s = d->data;
   return make_integer(ismember(s, value));
 }
 
-ReturnValue sets_intersection(KeyValueStore *kv, kv_key key1, kv_key key2) {
-  Datastructure *d1 = kv_store_get_entry(kv, key1);
+struct ReturnValue sets_intersection(struct KeyValueStore *kv, kv_key key1,
+                                     kv_key key2) {
+  struct Datastructure *d1 = kv_store_get_entry(kv, key1);
   TYPECHECK_DATASTRUCTURE_RETURN_EMPTY_ARRAY_IF_NULL(d1, SET);
-  Datastructure *d2 = kv_store_get_entry(kv, key2);
+  struct Datastructure *d2 = kv_store_get_entry(kv, key2);
   TYPECHECK_DATASTRUCTURE_RETURN_EMPTY_ARRAY_IF_NULL(d2, SET);
   struct Set *s1 = d1->data;
   struct Set *s2 = d2->data;
@@ -122,10 +125,11 @@ ReturnValue sets_intersection(KeyValueStore *kv, kv_key key1, kv_key key2) {
   return make_array(result, result_size);
 }
 
-ReturnValue sets_difference(KeyValueStore *kv, kv_key key1, kv_key key2) {
-  Datastructure *d1 = kv_store_get_entry(kv, key1);
+struct ReturnValue sets_difference(struct KeyValueStore *kv, kv_key key1,
+                                   kv_key key2) {
+  struct Datastructure *d1 = kv_store_get_entry(kv, key1);
   TYPECHECK_DATASTRUCTURE_RETURN_EMPTY_ARRAY_IF_NULL(d1, SET);
-  Datastructure *d2 = kv_store_get_entry(kv, key2);
+  struct Datastructure *d2 = kv_store_get_entry(kv, key2);
   TYPECHECK_DATASTRUCTURE(d2, SET);
 
   struct Set *s1 = d1->data;
@@ -149,10 +153,11 @@ ReturnValue sets_difference(KeyValueStore *kv, kv_key key1, kv_key key2) {
   return make_array(result, result_size);
 }
 
-ReturnValue sets_union(KeyValueStore *kv, kv_key key1, kv_key key2) {
-  Datastructure *d1 = kv_store_get_entry(kv, key1);
+struct ReturnValue sets_union(struct KeyValueStore *kv, kv_key key1,
+                              kv_key key2) {
+  struct Datastructure *d1 = kv_store_get_entry(kv, key1);
   TYPECHECK_DATASTRUCTURE(d1, SET);
-  Datastructure *d2 = kv_store_get_entry(kv, key2);
+  struct Datastructure *d2 = kv_store_get_entry(kv, key2);
   TYPECHECK_DATASTRUCTURE(d2, SET);
   if (d1 == NULL && d2 == NULL)
     return make_array(NULL, 0);

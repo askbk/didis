@@ -18,7 +18,7 @@ static int arr_contains_str(char **arr, int arr_length, char *str) {
 }
 
 static char *test_strings_set() {
-  KeyValueStore *kv = new_kv_store();
+  struct KeyValueStore *kv = new_kv_store();
   mu_assert("error, nonempty kv store", kv->size == 0);
   strings_set(kv, "a", "hello world");
   strings_set(kv, "ab", "yoyo");
@@ -29,7 +29,7 @@ static char *test_strings_set() {
 }
 
 static char *test_strings_get() {
-  KeyValueStore *kv = new_kv_store();
+  struct KeyValueStore *kv = new_kv_store();
   strings_set(kv, "hello", "world");
   char *v = strings_get(kv, "hello").string;
   mu_assert("kv_get should return value that was inserted",
@@ -42,7 +42,7 @@ static char *test_strings_get() {
 }
 
 static char *test_kv_exists() {
-  KeyValueStore *kv = new_kv_store();
+  struct KeyValueStore *kv = new_kv_store();
   strings_set(kv, "hello", "world");
   mu_assert("kv_store_key_exists should return 1 when key exists",
             kv_store_key_exists(kv, "hello").integer);
@@ -53,7 +53,7 @@ static char *test_kv_exists() {
 }
 
 static char *test_kv_delete() {
-  KeyValueStore *kv = new_kv_store();
+  struct KeyValueStore *kv = new_kv_store();
   strings_set(kv, "a", "hello world");
   strings_set(kv, "ab", "yoyo");
   kv_store_delete_entry(kv, "a");
@@ -66,7 +66,7 @@ static char *test_kv_delete() {
 }
 
 static char *test_strings_increment() {
-  KeyValueStore *kv = new_kv_store();
+  struct KeyValueStore *kv = new_kv_store();
   strings_set(kv, "counter", "123");
   strings_increment(kv, "counter");
   mu_assert("strings_increment should increment integers",
@@ -84,7 +84,7 @@ static char *test_strings_increment() {
 }
 
 static char *test_lists_lpush_lpop() {
-  KeyValueStore *kv = new_kv_store();
+  struct KeyValueStore *kv = new_kv_store();
   mu_assert("non-existing lists should have lengt 0",
             lists_length(kv, "fdsfodj").integer == 0);
   mu_assert("lists_lpush should increase list length",
@@ -105,13 +105,13 @@ static char *test_lists_lpush_lpop() {
 }
 
 static char *test_lists_rpush_rpop() {
-  KeyValueStore *kv = new_kv_store();
+  struct KeyValueStore *kv = new_kv_store();
   mu_assert("lists_rpush should increase list length",
             lists_rpush(kv, "mylist", "hello world").integer == 1);
 
   lists_rpush(kv, "mylist", "a");
   lists_rpush(kv, "mylist", "b");
-  ReturnValue mylist = lists_range(kv, "mylist", 0, 99);
+  struct ReturnValue mylist = lists_range(kv, "mylist", 0, 99);
   mu_assert("list should have length 3", mylist.array_length == 3);
   mu_assert("first list element should be the first rpushed",
             strcmp(mylist.array[0], "hello world") == 0);
@@ -130,7 +130,7 @@ static char *test_lists_rpush_rpop() {
 }
 
 static char *test_lists_move() {
-  KeyValueStore *kv = new_kv_store();
+  struct KeyValueStore *kv = new_kv_store();
   // list1: a
   // list2: b, c
   // move list1 list2 left left -> list2: a, b, c. list1: empty
@@ -142,7 +142,7 @@ static char *test_lists_move() {
                 0);
   mu_assert("lists_move should remove the element from the source list",
             lists_length(kv, "list1").integer == 0);
-  ReturnValue dest_list = lists_range(kv, "list2", 0, 10);
+  struct ReturnValue dest_list = lists_range(kv, "list2", 0, 10);
   mu_assert("lists_move should add the element to the destination list at the "
             "specified end",
             dest_list.array_length == 3);
@@ -157,7 +157,7 @@ static char *test_lists_move() {
 }
 
 static char *test_incorrect_type_handling() {
-  KeyValueStore *kv = new_kv_store();
+  struct KeyValueStore *kv = new_kv_store();
   strings_set(kv, "string1", "hwllo");
   mu_assert("calling function on wrong datastructure should return error",
             lists_rpush(kv, "string1", "test").type == ERR_RETURN);
@@ -168,7 +168,7 @@ static char *test_incorrect_type_handling() {
 }
 
 static char *test_lists_trim() {
-  KeyValueStore *kv = new_kv_store();
+  struct KeyValueStore *kv = new_kv_store();
   lists_rpush(kv, "list1", "a");
   lists_rpush(kv, "list1", "b");
   lists_rpush(kv, "list1", "c");
@@ -183,7 +183,7 @@ static char *test_lists_trim() {
   lists_rpush(kv, "list1", "a");
   lists_rpush(kv, "list1", "b");
   // list1: b,a,b
-  ReturnValue beforetrimmed = lists_range(kv, "list1", 0, 99);
+  struct ReturnValue beforetrimmed = lists_range(kv, "list1", 0, 99);
   mu_assert("lists_range should return the list items in correct order",
             strcmp(beforetrimmed.array[0], "b") == 0 &&
                 strcmp(beforetrimmed.array[1], "a") == 0 &&
@@ -191,7 +191,7 @@ static char *test_lists_trim() {
   lists_trim(kv, "list1", -99, -2);
   mu_assert("lists_trim should support negative indeces",
             lists_length(kv, "list1").integer == 2);
-  ReturnValue trimmed = lists_range(kv, "list1", 0, 99);
+  struct ReturnValue trimmed = lists_range(kv, "list1", 0, 99);
   mu_assert("lists_range returns the correct number of items",
             trimmed.array_length == 2);
   mu_assert("lists_range returns the correct items",
@@ -202,12 +202,12 @@ static char *test_lists_trim() {
 }
 
 static char *test_sets_basic_commands() {
-  KeyValueStore *kv = new_kv_store();
+  struct KeyValueStore *kv = new_kv_store();
   mu_assert("empty keys should have cardinality 0",
             sets_cardinality(kv, "f12").integer == 0);
   mu_assert("sets_cardinality return type on empty sets should be integer",
             sets_cardinality(kv, "rdsardsa").type == INT_RETURN);
-  ReturnValue r = sets_add(kv, "set", "hello");
+  struct ReturnValue r = sets_add(kv, "set", "hello");
   mu_assert(
       "sets_add should return the number of new elements added to the set",
       r.integer == 1);
@@ -248,7 +248,7 @@ static char *test_sets_basic_commands() {
 }
 
 static char *test_sets_intersection() {
-  KeyValueStore *kv = new_kv_store();
+  struct KeyValueStore *kv = new_kv_store();
   // test with two empty sets -> empty
   mu_assert("intersection of two empty sets returns no elements",
             sets_intersection(kv, "bla1", "bla5").array_length == 0);
@@ -269,7 +269,7 @@ static char *test_sets_intersection() {
       sets_intersection(kv, "set1", "set2").array_length == 0);
 
   sets_add(kv, "set1", "d");
-  ReturnValue inter1 = sets_intersection(kv, "set1", "set2");
+  struct ReturnValue inter1 = sets_intersection(kv, "set1", "set2");
   mu_assert("intersection of two sets should return all elements in common",
             inter1.array_length == 1);
   mu_assert("intersection contains correct elements",
@@ -280,13 +280,13 @@ static char *test_sets_intersection() {
 }
 
 static char *test_sets_difference() {
-  KeyValueStore *kv = new_kv_store();
+  struct KeyValueStore *kv = new_kv_store();
   mu_assert("difference between empty sets is empty",
             sets_difference(kv, "fdsafdsa", "foooofa").array_length == 0);
   sets_add(kv, "set1", "a");
   mu_assert("difference between empty sets and non-empty sets is empty",
             sets_difference(kv, "ffffffsaf", "set1").array_length == 0);
-  ReturnValue diff1 = sets_difference(kv, "set1", "fdsafpd");
+  struct ReturnValue diff1 = sets_difference(kv, "set1", "fdsafpd");
   mu_assert("difference between non-empty set and empty set is the entire "
             "non-empty set",
             diff1.array_length == 1);
@@ -300,7 +300,7 @@ static char *test_sets_difference() {
   sets_add(kv, "set2", "b");
   sets_add(kv, "set2", "c");
   sets_add(kv, "set2", "d");
-  ReturnValue diff2 = sets_difference(kv, "set1", "set2");
+  struct ReturnValue diff2 = sets_difference(kv, "set1", "set2");
   mu_assert("set difference has correct number of elements",
             diff2.array_length == 2);
   mu_assert("set difference contains correct elements",
@@ -311,7 +311,7 @@ static char *test_sets_difference() {
 }
 
 static char *test_sets_union() {
-  KeyValueStore *kv = new_kv_store();
+  struct KeyValueStore *kv = new_kv_store();
   mu_assert("union of empty sets is empty",
             sets_union(kv, "fds8fd", "fds089").array_length == 0);
   sets_add(kv, "set1", "a");

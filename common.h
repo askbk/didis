@@ -45,7 +45,7 @@ enum return_type {
 };
 enum datastructure { STRING, LIST, NIL, SET };
 
-typedef struct ReturnValue {
+struct ReturnValue {
   enum return_type type;
 
   char *string;
@@ -53,14 +53,14 @@ typedef struct ReturnValue {
   char *error_message;
   char **array;
   int array_length;
-} ReturnValue;
+};
 
-ReturnValue make_string(char *string);
-ReturnValue make_integer(long integer);
-ReturnValue make_nil();
-ReturnValue make_ok();
-ReturnValue make_error(char *error);
-ReturnValue make_array(char **array, int array_length);
+struct ReturnValue make_string(char *string);
+struct ReturnValue make_integer(long integer);
+struct ReturnValue make_nil();
+struct ReturnValue make_ok();
+struct ReturnValue make_error(char *error);
+struct ReturnValue make_array(char **array, int array_length);
 
 int min(int a, int b);
 int max(int a, int b);
