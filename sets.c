@@ -21,7 +21,8 @@ static struct Datastructure *make_set_datastructure() {
   return d;
 }
 
-struct ReturnValue sets_add(struct KeyValueStore *kv, kv_key key, char *value) {
+struct ReturnValue *sets_add(struct KeyValueStore *kv, kv_key key,
+                             char *value) {
   struct Datastructure *d = kv_store_get_entry(kv, key);
   if (d == NULL) {
     d = make_set_datastructure();
@@ -48,15 +49,15 @@ struct ReturnValue sets_add(struct KeyValueStore *kv, kv_key key, char *value) {
   return make_integer(1);
 }
 
-struct ReturnValue sets_cardinality(struct KeyValueStore *kv, kv_key key) {
+struct ReturnValue *sets_cardinality(struct KeyValueStore *kv, kv_key key) {
   struct Datastructure *d = kv_store_get_entry(kv, key);
   TYPECHECK_DATASTRUCTURE_RETURN_ZERO_IF_NULL(d, SET);
   struct Set *s = d->data;
   return make_integer(s->count);
 }
 
-struct ReturnValue sets_remove(struct KeyValueStore *kv, kv_key key,
-                               char *value) {
+struct ReturnValue *sets_remove(struct KeyValueStore *kv, kv_key key,
+                                char *value) {
   struct Datastructure *d = kv_store_get_entry(kv, key);
   TYPECHECK_DATASTRUCTURE_RETURN_ZERO_IF_NULL(d, SET);
   struct Set *s = d->data;
@@ -89,16 +90,16 @@ static int ismember(struct Set *set, char *value) {
   return 0;
 }
 
-struct ReturnValue sets_ismember(struct KeyValueStore *kv, kv_key key,
-                                 char *value) {
+struct ReturnValue *sets_ismember(struct KeyValueStore *kv, kv_key key,
+                                  char *value) {
   struct Datastructure *d = kv_store_get_entry(kv, key);
   TYPECHECK_DATASTRUCTURE_RETURN_ZERO_IF_NULL(d, SET);
   struct Set *s = d->data;
   return make_integer(ismember(s, value));
 }
 
-struct ReturnValue sets_intersection(struct KeyValueStore *kv, kv_key key1,
-                                     kv_key key2) {
+struct ReturnValue *sets_intersection(struct KeyValueStore *kv, kv_key key1,
+                                      kv_key key2) {
   struct Datastructure *d1 = kv_store_get_entry(kv, key1);
   TYPECHECK_DATASTRUCTURE_RETURN_EMPTY_ARRAY_IF_NULL(d1, SET);
   struct Datastructure *d2 = kv_store_get_entry(kv, key2);
@@ -125,8 +126,8 @@ struct ReturnValue sets_intersection(struct KeyValueStore *kv, kv_key key1,
   return make_array(result, result_size);
 }
 
-struct ReturnValue sets_difference(struct KeyValueStore *kv, kv_key key1,
-                                   kv_key key2) {
+struct ReturnValue *sets_difference(struct KeyValueStore *kv, kv_key key1,
+                                    kv_key key2) {
   struct Datastructure *d1 = kv_store_get_entry(kv, key1);
   TYPECHECK_DATASTRUCTURE_RETURN_EMPTY_ARRAY_IF_NULL(d1, SET);
   struct Datastructure *d2 = kv_store_get_entry(kv, key2);
@@ -153,8 +154,8 @@ struct ReturnValue sets_difference(struct KeyValueStore *kv, kv_key key1,
   return make_array(result, result_size);
 }
 
-struct ReturnValue sets_union(struct KeyValueStore *kv, kv_key key1,
-                              kv_key key2) {
+struct ReturnValue *sets_union(struct KeyValueStore *kv, kv_key key1,
+                               kv_key key2) {
   struct Datastructure *d1 = kv_store_get_entry(kv, key1);
   TYPECHECK_DATASTRUCTURE(d1, SET);
   struct Datastructure *d2 = kv_store_get_entry(kv, key2);

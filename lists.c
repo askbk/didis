@@ -104,8 +104,9 @@ static struct Datastructure *lists_add_list(struct KeyValueStore *kv,
 
 static int is_empty_list(struct List *l) { return l->length == 0; }
 
-static struct ReturnValue lists_push(struct KeyValueStore *kv, kv_key list_name,
-                                     element value, list_end whereto) {
+static struct ReturnValue *lists_push(struct KeyValueStore *kv,
+                                      kv_key list_name, element value,
+                                      list_end whereto) {
   struct Datastructure *d = kv_store_get_entry(kv, list_name);
   if (d == NULL)
     d = lists_add_list(kv, list_name);
@@ -134,17 +135,17 @@ void lists_print(struct KeyValueStore *kvs, kv_key list_name) {
   print(l);
 }
 
-struct ReturnValue lists_lpush(struct KeyValueStore *kv, kv_key list_name,
-                               element value) {
+struct ReturnValue *lists_lpush(struct KeyValueStore *kv, kv_key list_name,
+                                element value) {
   return lists_push(kv, list_name, value, LEFT);
 }
 
-struct ReturnValue lists_rpush(struct KeyValueStore *kv, kv_key list_name,
-                               element value) {
+struct ReturnValue *lists_rpush(struct KeyValueStore *kv, kv_key list_name,
+                                element value) {
   return lists_push(kv, list_name, value, RIGHT);
 }
 
-struct ReturnValue lists_length(struct KeyValueStore *kv, kv_key list_name) {
+struct ReturnValue *lists_length(struct KeyValueStore *kv, kv_key list_name) {
   struct Datastructure *d = kv_store_get_entry(kv, list_name);
   if (d == NULL)
     return make_integer(0);
@@ -152,30 +153,30 @@ struct ReturnValue lists_length(struct KeyValueStore *kv, kv_key list_name) {
   return make_integer(l->length);
 }
 
-static struct ReturnValue lists_pop(struct KeyValueStore *kvs, kv_key list_name,
-                                    list_end wherefrom) {
+static struct ReturnValue *lists_pop(struct KeyValueStore *kvs,
+                                     kv_key list_name, list_end wherefrom) {
   struct Datastructure *d = kv_store_get_entry(kvs, list_name);
   TYPECHECK_DATASTRUCTURE_RETURN_NIL_IF_NULL(d, LIST);
 
   struct List *l = d->data;
-  struct ReturnValue result = make_string(list_pop(l, wherefrom));
+  struct ReturnValue *result = make_string(list_pop(l, wherefrom));
   if (is_empty_list(l)) {
     kv_store_delete_entry(kvs, list_name);
   }
   return result;
 }
 
-struct ReturnValue lists_lpop(struct KeyValueStore *kvs, kv_key list_name) {
+struct ReturnValue *lists_lpop(struct KeyValueStore *kvs, kv_key list_name) {
   return lists_pop(kvs, list_name, LEFT);
 }
 
-struct ReturnValue lists_rpop(struct KeyValueStore *kvs, kv_key list_name) {
+struct ReturnValue *lists_rpop(struct KeyValueStore *kvs, kv_key list_name) {
   return lists_pop(kvs, list_name, RIGHT);
 }
 
-struct ReturnValue lists_move(struct KeyValueStore *kvs, kv_key src_key,
-                              kv_key dest_key, list_end wherefrom,
-                              list_end whereto) {
+struct ReturnValue *lists_move(struct KeyValueStore *kvs, kv_key src_key,
+                               kv_key dest_key, list_end wherefrom,
+                               list_end whereto) {
   struct Datastructure *d = kv_store_get_entry(kvs, src_key);
   TYPECHECK_DATASTRUCTURE_RETURN_NIL_IF_NULL(d, LIST);
 
@@ -226,8 +227,8 @@ static int trim_should_delete(int start_index, int end_index, int list_length) {
   return end_index < start_index;
 }
 
-struct ReturnValue lists_trim(struct KeyValueStore *kvs, kv_key list_name,
-                              int start, int end) {
+struct ReturnValue *lists_trim(struct KeyValueStore *kvs, kv_key list_name,
+                               int start, int end) {
   struct Datastructure *d = kv_store_get_entry(kvs, list_name);
   TYPECHECK_DATASTRUCTURE_RETURN_NIL_IF_NULL(d, LIST);
 
@@ -251,8 +252,8 @@ struct ReturnValue lists_trim(struct KeyValueStore *kvs, kv_key list_name,
   return make_ok();
 }
 
-struct ReturnValue lists_range(struct KeyValueStore *kvs, kv_key list_name,
-                               int start, int end) {
+struct ReturnValue *lists_range(struct KeyValueStore *kvs, kv_key list_name,
+                                int start, int end) {
   struct Datastructure *d = kv_store_get_entry(kvs, list_name);
   TYPECHECK_DATASTRUCTURE_RETURN_NIL_IF_NULL(d, LIST);
 

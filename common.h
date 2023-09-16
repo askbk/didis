@@ -55,12 +55,12 @@ struct ReturnValue {
   int array_length;
 };
 
-struct ReturnValue make_string(char *string);
-struct ReturnValue make_integer(long integer);
-struct ReturnValue make_nil();
-struct ReturnValue make_ok();
-struct ReturnValue make_error(char *error);
-struct ReturnValue make_array(char **array, int array_length);
+struct ReturnValue *make_string(char *string);
+struct ReturnValue *make_integer(long integer);
+struct ReturnValue *make_nil();
+struct ReturnValue *make_ok();
+struct ReturnValue *make_error(char *error);
+struct ReturnValue *make_array(char **array, int array_length);
 
 int min(int a, int b);
 int max(int a, int b);

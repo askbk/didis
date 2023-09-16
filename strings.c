@@ -18,19 +18,19 @@ static struct Datastructure *make_string_datastructure(element string) {
   return v;
 }
 
-struct ReturnValue strings_set(struct KeyValueStore *kv, kv_key key,
-                               element value) {
+struct ReturnValue *strings_set(struct KeyValueStore *kv, kv_key key,
+                                element value) {
   kv_store_set_entry(kv, key, make_string_datastructure(value));
   return make_ok();
 }
 
-struct ReturnValue strings_get(struct KeyValueStore *kv, kv_key key) {
+struct ReturnValue *strings_get(struct KeyValueStore *kv, kv_key key) {
   struct Datastructure *d = kv_store_get_entry(kv, key);
   TYPECHECK_DATASTRUCTURE_RETURN_NIL_IF_NULL(d, STRING);
   return make_string(d->data);
 }
 
-struct ReturnValue strings_increment(struct KeyValueStore *kv, kv_key key) {
+struct ReturnValue *strings_increment(struct KeyValueStore *kv, kv_key key) {
   struct Datastructure *d = kv_store_get_entry(kv, key);
   if (d == NULL) {
     strings_set(kv, key, "1");

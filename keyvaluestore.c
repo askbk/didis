@@ -50,7 +50,7 @@ static int kv_store_find_key_index(struct KeyValueStore *kv, kv_key key) {
   return -1;
 }
 
-struct ReturnValue kv_store_key_exists(struct KeyValueStore *kv, kv_key key) {
+struct ReturnValue *kv_store_key_exists(struct KeyValueStore *kv, kv_key key) {
   return make_integer(kv_store_find_key_index(kv, key) >= 0);
 }
 
@@ -90,7 +90,8 @@ void kv_store_set_entry(struct KeyValueStore *kv, kv_key key,
 
 // Deletes an entry from the KeyValueStore. Returns 0 if the entry does not
 // exist, otherwise returns 1.
-struct ReturnValue kv_store_delete_entry(struct KeyValueStore *kv, kv_key key) {
+struct ReturnValue *kv_store_delete_entry(struct KeyValueStore *kv,
+                                          kv_key key) {
   int key_index = kv_store_find_key_index(kv, key);
   if (key_index < 0)
     return make_integer(0);
