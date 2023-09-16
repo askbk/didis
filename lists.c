@@ -24,7 +24,10 @@ static void delete_list(struct List *list) {
   free(list);
 }
 
-static void lists_free(struct Datastructure *l) { delete_list(l->data); }
+static void lists_free(struct Datastructure *l) {
+  delete_list(l->data);
+  free(l);
+}
 
 static struct Datastructure *make_lists_datastructure(struct List *l) {
   struct Datastructure *d = malloc(sizeof(*d));
@@ -267,10 +270,11 @@ struct ReturnValue *lists_range(struct KeyValueStore *kvs, kv_key list_name,
 
   struct ListNode *curr = find_list_node_at_index(list, canonical_start);
   for (int i = 0; i < return_length; ++i) {
-    array[i] = malloc(sizeof(array[i]) * strlen(curr->value) + 1);
-    strcpy(array[i], curr->value);
+    array[i] = curr->value;
     curr = curr->right;
   }
 
-  return make_array(array, return_length);
+  struct ReturnValue *r = make_array(array, return_length);
+  free(array);
+  return r;
 }

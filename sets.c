@@ -8,6 +8,7 @@ static void sets_free(struct Datastructure *set_datastructure) {
   struct Set *s = set_datastructure->data;
   free(s->elements);
   free(s);
+  free(set_datastructure);
 }
 
 static struct Datastructure *make_set_datastructure() {

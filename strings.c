@@ -7,6 +7,7 @@
 
 static void strings_free(struct Datastructure *string_datastructure) {
   free(string_datastructure->data);
+  free(string_datastructure);
 }
 
 static struct Datastructure *make_string_datastructure(element string) {
