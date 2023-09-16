@@ -2,10 +2,27 @@
 #include <stdlib.h>
 #include <string.h>
 
+void free_returnvalue(struct ReturnValue *r) {
+  if (r->type == ARRAY_RETURN) {
+    for (int i = 0; i < r->array_length; ++i) {
+      free(r->array[i]);
+    }
+    free(r->array);
+  }
+  if (r->type == ERR_RETURN) {
+    free(r->error_message);
+  }
+  if (r->type == STR_RETURN) {
+    free(r->string);
+  }
+  free(r);
+}
+
 struct ReturnValue *make_string(char *string) {
   struct ReturnValue *r = malloc(sizeof *r);
   r->type = STR_RETURN;
-  r->string = string;
+  r->string = malloc((sizeof *r->string) * (strlen(string) + 1));
+  strcpy(r->string, string);
   return r;
 }
 
@@ -31,7 +48,8 @@ struct ReturnValue *make_ok() {
 struct ReturnValue *make_error(char *error) {
   struct ReturnValue *r = malloc(sizeof *r);
   r->type = ERR_RETURN;
-  r->error_message = error;
+  r->error_message = malloc((sizeof *r->error_message) * (strlen(error) + 1));
+  strcpy(r->error_message, error);
   return r;
 }
 

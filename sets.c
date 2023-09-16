@@ -115,16 +115,15 @@ struct ReturnValue *sets_intersection(struct KeyValueStore *kv, kv_key key1,
   int result_size = 0;
   for (int i = 0; i < smallest->count; ++i) {
     if (ismember(biggest, smallest->elements[i])) {
-      result[result_size] =
-          malloc(sizeof(result[result_size]) * strlen(smallest->elements[i]));
-      strcpy(result[result_size], smallest->elements[i]);
+      result[result_size] = smallest->elements[i];
       ++result_size;
     }
   }
 
   result = reallocarray(result, sizeof(result[0]), result_size);
-
-  return make_array(result, result_size);
+  struct ReturnValue *r = make_array(result, result_size);
+  free(result);
+  return r;
 }
 
 struct ReturnValue *sets_difference(struct KeyValueStore *kv, kv_key key1,
@@ -144,15 +143,15 @@ struct ReturnValue *sets_difference(struct KeyValueStore *kv, kv_key key1,
   int result_size = 0;
   for (int i = 0; i < s1->count; ++i) {
     if (!ismember(s2, s1->elements[i])) {
-      result[result_size] =
-          malloc(sizeof(result[result_size]) * strlen(s1->elements[i]));
-      strcpy(result[result_size], s1->elements[i]);
+      result[result_size] = s1->elements[i];
       ++result_size;
     }
   }
 
   result = reallocarray(result, sizeof(result[0]), result_size);
-  return make_array(result, result_size);
+  struct ReturnValue *r = make_array(result, result_size);
+  free(result);
+  return r;
 }
 
 struct ReturnValue *sets_union(struct KeyValueStore *kv, kv_key key1,
@@ -175,19 +174,18 @@ struct ReturnValue *sets_union(struct KeyValueStore *kv, kv_key key1,
   int result_size = s1->count;
 
   for (int i = 0; i < s1->count; ++i) {
-    result[i] = malloc(sizeof(*result) * strlen(s1->elements[i]));
-    strcpy(result[0], s1->elements[i]);
+    result[i] = s1->elements[i];
   }
 
   for (int i = 0; i < s2->count; ++i) {
     if (!ismember(s1, s2->elements[i])) {
-      result[result_size] = malloc(sizeof(*result) * strlen(s2->elements[i]));
-      strcpy(result[result_size], s2->elements[i]);
+      result[result_size] = s2->elements[i];
       result_size++;
     }
   }
 
   result = reallocarray(result, sizeof(*result), result_size);
-
-  return make_array(result, result_size);
+  struct ReturnValue *r = make_array(result, result_size);
+  free(result);
+  return r;
 }
